@@ -1,5 +1,7 @@
 package options
 
+import commontypes "lanyard/pkg/common_types"
+
 type ValidLanPartyOptionName int
 
 const (
@@ -38,4 +40,12 @@ func GetOption(optionDeclaration ValidLanPartyOptionName) *LanPartyOption {
 	default:
 		return nil
 	}
+}
+
+func GetOptionValueFromName(partyConfig *commontypes.LanParty, option string) any {
+	return GetOptionValue(partyConfig, optionNames[option])
+}
+
+func GetOptionValue(partyConfig *commontypes.LanParty, option ValidLanPartyOptionName) any {
+	return partyConfig.Options[Options[option]]
 }
