@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"io"
 	types "lanyard/pkg/common_types"
 	"log"
 	"os"
@@ -20,10 +21,15 @@ var rootCmd = &cobra.Command{
 
 var appConfig types.AppConfig = types.AppConfig{
 	LanPartyDataPath: "./party_config",
+	VerboseMode:      false,
+}
+
+func init() {
+	rootCmd.PersistentFlags().BoolVarP(&appConfig.VerboseMode, "verbose", "v", false, "configure the application to run in verbose mode")
 }
 
 func main() {
-	log.Default().SetOutput(os.Stderr)
+	log.Default().SetOutput(io.Discard)
 	runCli()
 }
 
@@ -36,4 +42,10 @@ func runCli() {
 
 func GetAppConfig() *types.AppConfig {
 	return &appConfig
+}
+
+func CheckVerboseMode(cmd *cobra.Command) {
+	if appConfig.VerboseMode {
+		log.Default().SetOutput(os.Stdout)
+	}
 }
