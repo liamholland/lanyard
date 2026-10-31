@@ -1,0 +1,24 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "shell",
+			"label": "build cli",
+			"command": "go build -o builds/ly -v ./cli/...",
+			"presentation": {
+				"echo": true,
+				"reveal": "always",
+				"focus": false,
+				"panel": "new",
+				"showReuseMessage": false,
+				"clear": false,
+				"close": true
+			},
+			"icon": {
+				"id": "build",
+				"color": "terminal.ansiGreen"
+			},
+			"problemMatcher": []
+		}
+	]
+}
