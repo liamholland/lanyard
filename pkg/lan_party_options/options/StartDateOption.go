@@ -31,9 +31,9 @@ var StartDateOption LanPartyOption = LanPartyOption{
 			return "", errors.ErrUnsupported
 		}
 
-		t, err := parseValidPOSIXTimestamp(v)
-		if err != nil {
-			return "", err
+		t, ok := v.(time.Time)
+		if !ok {
+			return "", errors.ErrUnsupported
 		}
 
 		return fmt.Sprintf("%s:%d", self.FileDeclaration, t.Unix()), nil
