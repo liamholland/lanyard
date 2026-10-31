@@ -2,9 +2,11 @@ package options
 
 import types "lanyard/pkg/common_types"
 
-type loadFunction func(*types.LanParty, any) error
+type readFunction func(*types.LanParty, any) error
+type writeFunction func(any, *LanPartyOption) (string, error)
 
 type LanPartyOption struct {
 	FileDeclaration string
-	LoadFunction    loadFunction
+	OnRead          readFunction
+	OnWrite         writeFunction
 }
