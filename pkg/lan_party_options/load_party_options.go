@@ -10,14 +10,15 @@ import (
 	"strings"
 )
 
-func LoadConfig(config *types.AppConfig) *types.LanParty {
+func LoadConfig(config *types.AppConfig) (*types.LanParty, error) {
 	if _, err := os.Stat(config.LanPartyDataPath); err == nil {
-		return readConfigFromFile(config.LanPartyDataPath)
+		return readConfigFromFile(config.LanPartyDataPath), nil
 	} else if errors.Is(err, os.ErrNotExist) {
-		return &types.LanParty{}
+		log.Print("the options file at the path '", config.LanPartyDataPath, "' does not exist")
+		return nil, err
+	} else {
+		return nil, err
 	}
-
-	return &types.LanParty{}
 }
 
 func readConfigFromFile(path string) *types.LanParty {
