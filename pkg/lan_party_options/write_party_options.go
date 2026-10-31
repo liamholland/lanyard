@@ -38,6 +38,7 @@ func UpdateConfig(appConfig *types.AppConfig, partyConfig types.LanParty) error 
 		return updateErr
 	}
 
+	os.Remove(appConfig.LanPartyDataPath + updateTmpConfigExtension)
 	return nil
 }
 

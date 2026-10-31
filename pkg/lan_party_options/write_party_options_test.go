@@ -42,7 +42,7 @@ func TestWriteStartDateOption(t *testing.T) {
 		os.Remove(testFilePath + ".old")
 	})
 
-	got := UpdateConfig(testConfig, commontypes.LanParty{Options: map[string]any{options.Options[options.StartDate]: "1793383526"}})
+	got := UpdateConfig(testConfig, commontypes.LanParty{Options: map[string]any{options.Options[options.StartDate]: time.Unix(1793383526, 0)}})
 	if got != nil {
 		t.Error(got)
 	}
@@ -51,7 +51,7 @@ func TestWriteStartDateOption(t *testing.T) {
 func TestConfigRestoredWhenUpdateFails(t *testing.T) {
 	testConfig := &commontypes.AppConfig{LanPartyDataPath: testFilePath}
 	CreateConfigFile(testConfig)
-	setup := UpdateConfig(testConfig, commontypes.LanParty{Options: map[string]any{options.Options[options.StartDate]: "1793383526"}})
+	setup := UpdateConfig(testConfig, commontypes.LanParty{Options: map[string]any{options.Options[options.StartDate]: time.Unix(1793383526, 0)}})
 	if setup != nil {
 		t.Error("failed to set up the test files")
 	}
