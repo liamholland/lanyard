@@ -25,13 +25,13 @@ func IsValidOptionName(optionName string) bool {
 
 func GetOptionFromName(optionName string) *LanPartyOption {
 	if IsValidOptionName(optionName) {
-		return getOption(optionNames[optionName])
+		return GetOption(optionNames[optionName])
 	}
 
 	return nil
 }
 
-func getOption(optionDeclaration ValidLanPartyOptionName) *LanPartyOption {
+func GetOption(optionDeclaration ValidLanPartyOptionName) *LanPartyOption {
 	switch optionDeclaration {
 	case StartDate:
 		return &StartDateOption

@@ -3,6 +3,7 @@ package lanpartyoptions
 import (
 	"errors"
 	commontypes "lanyard/pkg/common_types"
+	"lanyard/pkg/lan_party_options/options"
 	"os"
 	"testing"
 	"time"
@@ -17,16 +18,15 @@ func TestConfigPathNotFound(t *testing.T) {
 
 func TestLoadConfigValidOptions(t *testing.T) {
 	got, _ := LoadConfig(&commontypes.AppConfig{LanPartyDataPath: "./test/validoptions.txt"})
-	want := commontypes.LanParty{StartDate: time.Unix(1793383526, 0)}
-	if *got != want {
+	want := time.Unix(1793383526, 0)
+	if got.Options[options.Options[options.StartDate]] != want {
 		t.Error()
 	}
 }
 
 func TestLoadConfigInvalidOptions(t *testing.T) {
 	got, _ := LoadConfig(&commontypes.AppConfig{LanPartyDataPath: "./test/invalidoptions.txt"})
-	want := commontypes.LanParty{}
-	if *got != want {
-		t.Error()
+	if len(got.Options) != 0 {
+		t.Error(got)
 	}
 }

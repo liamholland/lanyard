@@ -22,7 +22,7 @@ func LoadConfig(config *types.AppConfig) (*types.LanParty, error) {
 }
 
 func readConfigFromFile(path string) *types.LanParty {
-	config := types.LanParty{}
+	config := types.LanParty{Options: make(map[string]any)}
 
 	file, err := os.Open(path)
 	if err != nil {
@@ -47,7 +47,7 @@ func readOption(line string, lp *types.LanParty) {
 	input := strings.Split(line, ":")
 	if options.IsValidOptionName(input[0]) {
 		option := options.GetOptionFromName(input[0])
-		err := option.LoadFunction(lp, input[1])
+		err := option.OnRead(lp, input[1])
 		if err != nil {
 			log.Print(option.FileDeclaration, " has a malformed value declaration ", input[1])
 		}
