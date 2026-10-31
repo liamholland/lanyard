@@ -3,7 +3,6 @@ package lanpartyoptions
 import (
 	"bufio"
 	"errors"
-	"fmt"
 	types "lanyard/pkg/common_types"
 	options "lanyard/pkg/lan_party_options/options"
 	"log"
@@ -26,18 +25,18 @@ func readConfigFromFile(path string) *types.LanParty {
 
 	file, err := os.Open(path)
 	if err != nil {
+		log.Printf("failed to open file with path '%s': %s\n", path, err.Error())
 		return &config
 	}
 	defer file.Close()
 
 	s := bufio.NewScanner(file)
 	for s.Scan() {
-		fmt.Print(s.Text())
 		readOption(s.Text(), &config)
 	}
 
 	if err := s.Err(); err != nil {
-		log.Print("error while scanning: ", err.Error())
+		log.Print("error while scanning tokens: ", err.Error())
 	}
 
 	return &config
