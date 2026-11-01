@@ -2,7 +2,6 @@ package lanpartyoptions
 
 import (
 	"bufio"
-	"errors"
 	types "lanyard/pkg/common_types"
 	options "lanyard/pkg/lan_party_options/options"
 	"log"
@@ -13,7 +12,7 @@ import (
 func LoadConfig(config *types.AppConfig) (*types.LanParty, error) {
 	if _, err := os.Stat(config.LanPartyDataPath); err == nil {
 		return readConfigFromFile(config.LanPartyDataPath), nil
-	} else if errors.Is(err, os.ErrNotExist) {
+	} else if os.IsNotExist(err) {
 		log.Print("the options file at the path '", config.LanPartyDataPath, "' does not exist")
 		return nil, err
 	} else {
