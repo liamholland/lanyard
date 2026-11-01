@@ -14,14 +14,13 @@ var rootCmd = &cobra.Command{
 	Use:     "ly",
 	Aliases: []string{"lanyard"},
 	Short:   "cli tool for managing lanyard server",
-	Run: func(cmd *cobra.Command, args []string) {
-
-	},
+	Run:     func(cmd *cobra.Command, args []string) {},
 }
 
 var appConfig types.AppConfig = types.AppConfig{
 	LanPartyDataPath: "./party_config",
 	VerboseMode:      false,
+	ServerPort:       1311,
 }
 
 func init() {
