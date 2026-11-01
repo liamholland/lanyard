@@ -1,6 +1,9 @@
 package options
 
-import commontypes "lanyard/pkg/common_types"
+import (
+	commontypes "lanyard/pkg/common_types"
+	"maps"
+)
 
 type ValidLanPartyOptionName int
 
@@ -48,4 +51,10 @@ func GetOptionValueFromName(partyConfig *commontypes.LanParty, option string) an
 
 func GetOptionValue(partyConfig *commontypes.LanParty, option ValidLanPartyOptionName) any {
 	return partyConfig.Options[Options[option]]
+}
+
+func Copy(original *commontypes.LanParty) *commontypes.LanParty {
+	copy := commontypes.LanParty{Options: make(map[string]any)}
+	maps.Copy(copy.Options, original.Options)
+	return &copy
 }
