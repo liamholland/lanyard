@@ -114,7 +114,7 @@ func displayGameResolution(gameRes *service.GameListResolution) {
 			continue
 		}
 
-		fmt.Printf("> %-20s%s\n", g, func() string {
+		fmt.Printf("> %-30s%s\n", g, func() string {
 			if r {
 				return "ok!"
 			}
