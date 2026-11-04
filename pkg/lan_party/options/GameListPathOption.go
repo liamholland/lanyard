@@ -2,7 +2,6 @@ package options
 
 import (
 	"errors"
-	"fmt"
 	lp "lanyard/pkg/lan_party"
 	"log"
 	"path/filepath"
@@ -21,7 +20,7 @@ var GameListPathOption LanPartyOption = LanPartyOption{
 		return nil
 	},
 
-	func(v any, self *LanPartyOption) (string, error) {
+	func(v any) (string, error) {
 		if v == nil {
 			return "", errors.ErrUnsupported
 		}
@@ -36,6 +35,6 @@ var GameListPathOption LanPartyOption = LanPartyOption{
 			return "", filepath.ErrBadPattern
 		}
 
-		return fmt.Sprintf("%s:%s", Options[GameListPath], p), nil
+		return p, nil
 	},
 }

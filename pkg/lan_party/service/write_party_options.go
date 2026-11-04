@@ -83,12 +83,12 @@ func writeOption(file *os.File, option opts.ValidLanPartyOptionName, value any) 
 	}
 
 	o := opts.GetOption(option)
-	inFileOption, formatErr := o.OnWrite(value, o)
+	inFileOption, formatErr := o.GetFileString(value)
 	if formatErr != nil {
 		return formatErr
 	}
 
-	_, writeErr := file.WriteString(inFileOption + "\n")
+	_, writeErr := file.WriteString(inFileOption)
 	if writeErr != nil {
 		return writeErr
 	}
