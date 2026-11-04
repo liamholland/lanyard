@@ -1,15 +1,16 @@
-package lanpartyoptions
+package service
 
 import (
 	"bufio"
-	types "lanyard/pkg/common_types"
-	options "lanyard/pkg/lan_party_options/options"
+	cfg "lanyard/pkg/config"
+	lp "lanyard/pkg/lan_party"
+	opts "lanyard/pkg/lan_party/options"
 	"log"
 	"os"
 	"strings"
 )
 
-func LoadConfig(config *types.AppConfig) (*types.LanParty, error) {
+func LoadConfig(config *cfg.AppConfig) (*lp.LanParty, error) {
 	if _, err := os.Stat(config.LanPartyDataPath); err == nil {
 		return readConfigFromFile(config.LanPartyDataPath), nil
 	} else if os.IsNotExist(err) {
@@ -20,8 +21,8 @@ func LoadConfig(config *types.AppConfig) (*types.LanParty, error) {
 	}
 }
 
-func readConfigFromFile(path string) *types.LanParty {
-	config := types.LanParty{Options: make(map[string]any)}
+func readConfigFromFile(path string) *lp.LanParty {
+	config := lp.LanParty{Options: make(map[string]any)}
 
 	file, err := os.Open(path)
 	if err != nil {
@@ -42,10 +43,10 @@ func readConfigFromFile(path string) *types.LanParty {
 	return &config
 }
 
-func readOption(line string, lp *types.LanParty) {
+func readOption(line string, lp *lp.LanParty) {
 	input := strings.Split(line, ":")
-	if options.IsValidOptionName(input[0]) {
-		option := options.GetOptionFromName(input[0])
+	if opts.IsValidOptionName(input[0]) {
+		option := opts.GetOptionFromName(input[0])
 		err := option.OnRead(lp, input[1])
 		if err != nil {
 			log.Print(option.FileDeclaration, " has a malformed value declaration ", input[1])

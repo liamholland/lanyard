@@ -1,4 +1,4 @@
-package commontypes
+package config
 
 type AppConfig struct {
 	LanPartyDataPath string

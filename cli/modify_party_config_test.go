@@ -1,9 +1,10 @@
 package main
 
 import (
-	common_types "lanyard/pkg/common_types"
-	service "lanyard/pkg/lan_party_options"
-	"lanyard/pkg/lan_party_options/options"
+	cfg "lanyard/pkg/config"
+	lp "lanyard/pkg/lan_party"
+	opts "lanyard/pkg/lan_party/options"
+	service "lanyard/pkg/lan_party/service"
 	"os"
 	"strconv"
 	"testing"
@@ -14,7 +15,7 @@ const testPath string = "test/validoptions.txt"
 
 func TestCreatePartyConfigFileWithDefaults(t *testing.T) {
 	testPath := "test/create_test.txt"
-	appConfig := &common_types.AppConfig{LanPartyDataPath: testPath}
+	appConfig := &cfg.AppConfig{LanPartyDataPath: testPath}
 	t.Cleanup(func() {
 		os.Remove(testPath)
 	})
@@ -28,7 +29,7 @@ func TestCreatePartyConfigFileWithDefaults(t *testing.T) {
 
 func TestCreatePartyConfigFileWithDefaults_ServiceFailure(t *testing.T) {
 	testPath := "fake_test_dir/fail_create.txt"
-	appConfig := &common_types.AppConfig{LanPartyDataPath: testPath}
+	appConfig := &cfg.AppConfig{LanPartyDataPath: testPath}
 
 	CreatePartyConfigFileWithDefaults(appConfig)
 
@@ -38,39 +39,39 @@ func TestCreatePartyConfigFileWithDefaults_ServiceFailure(t *testing.T) {
 }
 
 func TestGetCurrentSettingForOption_ConfigNotFound(t *testing.T) {
-	appConfig := &common_types.AppConfig{LanPartyDataPath: "non_existent_path"}
+	appConfig := &cfg.AppConfig{LanPartyDataPath: "non_existent_path"}
 
 	GetCurrentSettingForOption(appConfig, "some_option")
 }
 
 func TestGetCurrentSettingForOption_ValidSetting(t *testing.T) {
-	appConfig := &common_types.AppConfig{LanPartyDataPath: testPath}
+	appConfig := &cfg.AppConfig{LanPartyDataPath: testPath}
 
-	GetCurrentSettingForOption(appConfig, options.Options[options.StartDate])
+	GetCurrentSettingForOption(appConfig, opts.Options[opts.StartDate])
 }
 
 func TestGetCurrentSettingForOption_InvalidOptionName(t *testing.T) {
-	appConfig := &common_types.AppConfig{LanPartyDataPath: testPath}
+	appConfig := &cfg.AppConfig{LanPartyDataPath: testPath}
 
 	GetCurrentSettingForOption(appConfig, "insetting_name")
 }
 
 func TestGetCurrentSettingForOption_EmptyValue(t *testing.T) {
-	appConfig := &common_types.AppConfig{LanPartyDataPath: testPath}
+	appConfig := &cfg.AppConfig{LanPartyDataPath: testPath}
 
 	GetCurrentSettingForOption(appConfig, "some_option")
 }
 
 func TestUpdateCurrentSettingForOption_Success(t *testing.T) {
-	appConfig := &common_types.AppConfig{LanPartyDataPath: testPath}
+	appConfig := &cfg.AppConfig{LanPartyDataPath: testPath}
 
 	initialTime := time.Unix(1793383526, 0)
-	initialParty := common_types.LanParty{Options: make(map[string]any)}
-	initialParty.Options[options.Options[options.StartDate]] = initialTime
+	initialParty := lp.LanParty{Options: make(map[string]any)}
+	initialParty.Options[opts.Options[opts.StartDate]] = initialTime
 	service.UpdateConfig(appConfig, initialParty)
 
 	newValue := time.Now().Add(time.Hour)
-	UpdateCurrentSettingForOption(appConfig, options.Options[options.StartDate], strconv.FormatInt(newValue.Unix(), 10))
+	UpdateCurrentSettingForOption(appConfig, opts.Options[opts.StartDate], strconv.FormatInt(newValue.Unix(), 10))
 
 	updatedSettings := loadConfig(appConfig)
 
@@ -78,7 +79,7 @@ func TestUpdateCurrentSettingForOption_Success(t *testing.T) {
 		t.Fatal("Failed to load config after update.")
 	}
 
-	actualValue, ok := updatedSettings.Options[options.Options[options.StartDate]]
+	actualValue, ok := updatedSettings.Options[opts.Options[opts.StartDate]]
 	if !ok {
 		t.Fatal("startDate option not found in updated config.")
 	}
@@ -89,25 +90,25 @@ func TestUpdateCurrentSettingForOption_Success(t *testing.T) {
 }
 
 func TestUpdateCurrentSettingForOption_InvalidOptionName(t *testing.T) {
-	appConfig := &common_types.AppConfig{LanPartyDataPath: testPath}
+	appConfig := &cfg.AppConfig{LanPartyDataPath: testPath}
 
-	service.UpdateConfig(appConfig, common_types.LanParty{Options: map[string]any{options.Options[options.StartDate]: time.Now()}})
+	service.UpdateConfig(appConfig, lp.LanParty{Options: map[string]any{opts.Options[opts.StartDate]: time.Now()}})
 
 	UpdateCurrentSettingForOption(appConfig, "invalid_setting", strconv.FormatInt(time.Now().Unix(), 10))
 }
 
 func TestUpdateCurrentSettingForOption_InvalidValue(t *testing.T) {
-	appConfig := &common_types.AppConfig{LanPartyDataPath: testPath}
+	appConfig := &cfg.AppConfig{LanPartyDataPath: testPath}
 
-	service.UpdateConfig(appConfig, common_types.LanParty{Options: map[string]any{options.Options[options.StartDate]: time.Now()}})
+	service.UpdateConfig(appConfig, lp.LanParty{Options: map[string]any{opts.Options[opts.StartDate]: time.Now()}})
 
-	UpdateCurrentSettingForOption(appConfig, options.Options[options.StartDate], "not a valid time")
+	UpdateCurrentSettingForOption(appConfig, opts.Options[opts.StartDate], "not a valid time")
 }
 
 func TestUpdateCurrentSettingForOption_ServiceFailure(t *testing.T) {
-	appConfig := &common_types.AppConfig{LanPartyDataPath: "fake_test_dir/settings.txt"}
+	appConfig := &cfg.AppConfig{LanPartyDataPath: "fake_test_dir/settings.txt"}
 
-	service.UpdateConfig(appConfig, common_types.LanParty{Options: map[string]any{options.Options[options.StartDate]: time.Now()}})
+	service.UpdateConfig(appConfig, lp.LanParty{Options: map[string]any{opts.Options[opts.StartDate]: time.Now()}})
 
-	UpdateCurrentSettingForOption(appConfig, options.Options[options.StartDate], strconv.FormatInt(time.Now().Add(time.Hour).Unix(), 10))
+	UpdateCurrentSettingForOption(appConfig, opts.Options[opts.StartDate], strconv.FormatInt(time.Now().Add(time.Hour).Unix(), 10))
 }

@@ -1,8 +1,8 @@
 package options
 
-import types "lanyard/pkg/common_types"
+import lp "lanyard/pkg/lan_party"
 
-type readFunction func(*types.LanParty, any) error
+type readFunction func(*lp.LanParty, any) error
 type writeFunction func(any, *LanPartyOption) (string, error)
 
 type LanPartyOption struct {
