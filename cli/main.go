@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"io"
-	types "lanyard/pkg/common_types"
+	cfg "lanyard/pkg/config"
 	"log"
 	"os"
 
@@ -17,7 +17,7 @@ var rootCmd = &cobra.Command{
 	Run:     func(cmd *cobra.Command, args []string) {},
 }
 
-var appConfig types.AppConfig = types.AppConfig{
+var appConfig cfg.AppConfig = cfg.AppConfig{
 	LanPartyDataPath: "./party_config",
 	VerboseMode:      false,
 	ServerPort:       1311,
@@ -39,7 +39,7 @@ func runCli() {
 	}
 }
 
-func GetAppConfig() *types.AppConfig {
+func GetAppConfig() *cfg.AppConfig {
 	return &appConfig
 }
 

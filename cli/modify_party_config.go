@@ -2,9 +2,10 @@ package main
 
 import (
 	"fmt"
-	types "lanyard/pkg/common_types"
-	service "lanyard/pkg/lan_party_options"
-	opts "lanyard/pkg/lan_party_options/options"
+	cfg "lanyard/pkg/config"
+	lp "lanyard/pkg/lan_party"
+	opts "lanyard/pkg/lan_party/options"
+	service "lanyard/pkg/lan_party/service"
 	"log"
 	"os"
 	"time"
@@ -57,7 +58,7 @@ func init() {
 	rootCmd.AddCommand(partyConfigCommand)
 }
 
-func CreatePartyConfigFileWithDefaults(appConfig *types.AppConfig) {
+func CreatePartyConfigFileWithDefaults(appConfig *cfg.AppConfig) {
 	log.Print("creating file at: ", appConfig.LanPartyDataPath)
 
 	createErr := service.CreateConfigFile(appConfig)
@@ -66,7 +67,7 @@ func CreatePartyConfigFileWithDefaults(appConfig *types.AppConfig) {
 		return
 	}
 
-	writeErr := service.UpdateConfig(appConfig, types.LanParty{
+	writeErr := service.UpdateConfig(appConfig, lp.LanParty{
 		Options: map[string]any{
 			opts.Options[opts.StartDate]: time.Now(), // start date
 		},
@@ -76,7 +77,7 @@ func CreatePartyConfigFileWithDefaults(appConfig *types.AppConfig) {
 	}
 }
 
-func GetCurrentSettingForOption(appConfig *types.AppConfig, arg string) {
+func GetCurrentSettingForOption(appConfig *cfg.AppConfig, arg string) {
 	log.Print("getting value of setting '", arg, "' in config at: ", appConfig.LanPartyDataPath)
 
 	settings := loadConfig(appConfig)
@@ -98,7 +99,7 @@ func GetCurrentSettingForOption(appConfig *types.AppConfig, arg string) {
 	fmt.Println("Setting '", arg, "' is currently set as: ", v)
 }
 
-func UpdateCurrentSettingForOption(appConfig *types.AppConfig, arg string, v string) {
+func UpdateCurrentSettingForOption(appConfig *cfg.AppConfig, arg string, v string) {
 	log.Print("updating the value of setting '", arg, "' to '", v, "'")
 
 	ok := opts.IsValidOptionName(arg)
@@ -135,7 +136,7 @@ func UpdateCurrentSettingForOption(appConfig *types.AppConfig, arg string, v str
 	fmt.Println("Set value of '", arg, "' to '", v, "'")
 }
 
-func loadConfig(appConfig *types.AppConfig) *types.LanParty {
+func loadConfig(appConfig *cfg.AppConfig) *lp.LanParty {
 
 	settings, loadError := service.LoadConfig(appConfig)
 	if os.IsNotExist(loadError) {

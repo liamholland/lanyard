@@ -1,7 +1,7 @@
 package main
 
 import (
-	commontypes "lanyard/pkg/common_types"
+	cfg "lanyard/pkg/config"
 	server "lanyard/server/pkg"
 
 	"github.com/spf13/cobra"
@@ -29,6 +29,6 @@ func init() {
 	rootCmd.AddCommand(serverCmd)
 }
 
-func StartServer(appConfig *commontypes.AppConfig) {
+func StartServer(appConfig *cfg.AppConfig) {
 	server.StartServer(appConfig)
 }

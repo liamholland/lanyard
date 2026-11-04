@@ -1,10 +1,10 @@
 package pkg
 
 import (
-	commontypes "lanyard/pkg/common_types"
+	cfg "lanyard/pkg/config"
 	server "lanyard/server/internal"
 )
 
-func StartServer(appConfig *commontypes.AppConfig) {
+func StartServer(appConfig *cfg.AppConfig) {
 	server.Start(appConfig)
 }

@@ -1,15 +1,16 @@
-package lanpartyoptions
+package service
 
 import (
-	types "lanyard/pkg/common_types"
-	"lanyard/pkg/lan_party_options/options"
+	cfg "lanyard/pkg/config"
+	lp "lanyard/pkg/lan_party"
+	opts "lanyard/pkg/lan_party/options"
 	"log"
 	"os"
 )
 
 const updateTmpConfigExtension string = ".old"
 
-func CreateConfigFile(appConfig *types.AppConfig) error {
+func CreateConfigFile(appConfig *cfg.AppConfig) error {
 	_, err := os.OpenFile(appConfig.LanPartyDataPath, os.O_RDONLY|os.O_CREATE, 0666)
 	if err != nil {
 		log.Printf("failed to create file at path '%s'", appConfig.LanPartyDataPath)
@@ -18,7 +19,7 @@ func CreateConfigFile(appConfig *types.AppConfig) error {
 	return nil
 }
 
-func UpdateConfig(appConfig *types.AppConfig, partyConfig types.LanParty) error {
+func UpdateConfig(appConfig *cfg.AppConfig, partyConfig lp.LanParty) error {
 	reanameErr := os.Rename(appConfig.LanPartyDataPath, appConfig.LanPartyDataPath+updateTmpConfigExtension)
 	if reanameErr != nil {
 		log.Print("failed to rename existing config: ", reanameErr.Error())
@@ -42,7 +43,7 @@ func UpdateConfig(appConfig *types.AppConfig, partyConfig types.LanParty) error 
 	return nil
 }
 
-func update(appConfig *types.AppConfig, partyConfig *types.LanParty) error {
+func update(appConfig *cfg.AppConfig, partyConfig *lp.LanParty) error {
 	createErr := CreateConfigFile(appConfig)
 	if createErr != nil {
 		return createErr
@@ -57,7 +58,7 @@ func update(appConfig *types.AppConfig, partyConfig *types.LanParty) error {
 	return nil
 }
 
-func writeOptions(filePath string, partyConfig *types.LanParty) error {
+func writeOptions(filePath string, partyConfig *lp.LanParty) error {
 	file, openErr := os.OpenFile(filePath, os.O_APPEND|os.O_WRONLY, os.ModeAppend)
 	if openErr != nil {
 		log.Print("failed to open file for writing options")
@@ -65,18 +66,18 @@ func writeOptions(filePath string, partyConfig *types.LanParty) error {
 	}
 	defer file.Close()
 
-	for option := range options.Options {
-		err := writeOption(file, option, partyConfig.Options[options.Options[options.StartDate]])
+	for option := range opts.Options {
+		err := writeOption(file, option, partyConfig.Options[opts.Options[opts.StartDate]])
 		if err != nil {
-			log.Print("failed to write option '", options.Options[option], "': ", err.Error())
+			log.Print("failed to write option '", opts.Options[option], "': ", err.Error())
 			return err
 		}
 	}
 	return nil
 }
 
-func writeOption(file *os.File, option options.ValidLanPartyOptionName, value any) error {
-	o := options.GetOption(option)
+func writeOption(file *os.File, option opts.ValidLanPartyOptionName, value any) error {
+	o := opts.GetOption(option)
 	inFileOption, formatErr := o.OnWrite(value, o)
 	if formatErr != nil {
 		return formatErr

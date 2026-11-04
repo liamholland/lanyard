@@ -2,13 +2,13 @@ package internal
 
 import (
 	"errors"
-	commontypes "lanyard/pkg/common_types"
+	cfg "lanyard/pkg/config"
 	"log"
 	"net/http"
 	"strconv"
 )
 
-func Start(appConfig *commontypes.AppConfig) {
+func Start(appConfig *cfg.AppConfig) {
 	log.Print("starting server on port ", appConfig.ServerPort)
 
 	http.HandleFunc("/health/check", healthCheck)
