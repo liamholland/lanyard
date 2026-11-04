@@ -7,8 +7,6 @@ import (
 	"strings"
 )
 
-type GameList []string
-
 func ReadGameList(fp string) (*GameList, error) {
 	if _, err := os.Stat(fp); err == nil {
 		return readConfigFromFile(fp), nil

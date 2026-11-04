@@ -26,25 +26,46 @@ var viewGameListCmd = &cobra.Command{
 	},
 }
 
+var resolveGameListCmd = &cobra.Command{
+	Use:   "resolve",
+	Short: "resolve the games list across game directories",
+	Args:  cobra.MinimumNArgs(1),
+	Run: func(cmd *cobra.Command, args []string) {
+		CheckVerboseMode(cmd)
+		ResolveGameList(GetAppConfig(), userGameListPathFlagValue, args)
+	},
+}
+
 var userGameListPathFlagValue = ""
 
 func init() {
 	gameListCmd.PersistentFlags().StringVarP(&userGameListPathFlagValue, "path", "p", "", "set the path of the game list to use")
 
 	gameListCmd.AddCommand(viewGameListCmd)
+	gameListCmd.AddCommand(resolveGameListCmd)
 	rootCmd.AddCommand(gameListCmd)
 }
 
 func ViewGameList(appConfig *cfg.AppConfig, userPath string) {
 	if userPath != "" {
-		readFromUserPath(userPath)
+		readFromPath(userPath)
 		return
 	}
 
 	readFromSetting(appConfig)
 }
 
-func readFromUserPath(path string) {
+func ResolveGameList(appConfig *cfg.AppConfig, userPath string, gamePaths []string) {
+	log.Print("resolving games")
+	if userPath != "" {
+		resolveFromPath(userPath, gamePaths)
+		return
+	}
+
+	resolveFromSetting(appConfig, gamePaths)
+}
+
+func readFromPath(path string) {
 	gl, err := service.ReadGameList(path)
 	if err != nil {
 		return
@@ -54,10 +75,59 @@ func readFromUserPath(path string) {
 }
 
 func readFromSetting(appConfig *cfg.AppConfig) {
+	fp := getGameListPathFromSetting(appConfig)
+	readFromPath(fp)
+}
+
+func displayGameList(gl *service.GameList) {
+	fmt.Println("games on the list:")
+	for _, g := range *gl {
+		fmt.Println("> ", g)
+	}
+}
+
+func resolveFromPath(listPath string, gamePaths []string) {
+	gl, err := service.ReadGameList(listPath)
+	if err != nil {
+		log.Print("error while read game list")
+		return
+	}
+
+	resolvedGames := service.ResolveGameList(gl, gamePaths)
+	if resolvedGames == nil {
+		log.Print("error occurred during game resolution")
+		return
+	}
+
+	displayGameResolution(resolvedGames)
+}
+
+func resolveFromSetting(config *cfg.AppConfig, gamePaths []string) {
+	fp := getGameListPathFromSetting(&appConfig)
+	resolveFromPath(fp, gamePaths)
+}
+
+func displayGameResolution(gameRes *service.GameListResolution) {
+	fmt.Println("result of game resolution:")
+	for g, r := range *gameRes {
+		if g == "" {
+			continue
+		}
+
+		fmt.Printf("> %-30s%s\n", g, func() string {
+			if r {
+				return "ok!"
+			}
+			return "missing"
+		}())
+	}
+}
+
+func getGameListPathFromSetting(appConfig *cfg.AppConfig) string {
 	lpConfig := loadConfig(appConfig)
 	if lpConfig == nil {
 		fmt.Print("no path provided to read list from")
-		return
+		return ""
 	}
 
 	optionValue := opts.GetOptionValue(lpConfig, opts.GameListPath)
@@ -66,17 +136,5 @@ func readFromSetting(appConfig *cfg.AppConfig) {
 		log.Fatal("current option value is invalid: ", optionValue)
 	}
 
-	gl, err := service.ReadGameList(fp)
-	if err != nil {
-		return
-	}
-
-	displayGameList(gl)
-}
-
-func displayGameList(gl *service.GameList) {
-	fmt.Println("games on the list:")
-	for _, g := range *gl {
-		fmt.Println("> ", g)
-	}
+	return fp
 }
