@@ -67,7 +67,7 @@ func writeOptions(filePath string, partyConfig *lp.LanParty) error {
 	defer file.Close()
 
 	for option := range opts.Options {
-		err := writeOption(file, option, partyConfig.Options[opts.Options[opts.StartDate]])
+		err := writeOption(file, option, partyConfig.Options[opts.Options[option]])
 		if err != nil {
 			log.Print("failed to write option '", opts.Options[option], "': ", err.Error())
 			return err
@@ -77,13 +77,18 @@ func writeOptions(filePath string, partyConfig *lp.LanParty) error {
 }
 
 func writeOption(file *os.File, option opts.ValidLanPartyOptionName, value any) error {
+	if value == nil {
+		log.Print("no value for option '", opts.Options[option], "'. skipping...")
+		return nil
+	}
+
 	o := opts.GetOption(option)
 	inFileOption, formatErr := o.OnWrite(value, o)
 	if formatErr != nil {
 		return formatErr
 	}
 
-	_, writeErr := file.Write([]byte(inFileOption))
+	_, writeErr := file.WriteString(inFileOption + "\n")
 	if writeErr != nil {
 		return writeErr
 	}

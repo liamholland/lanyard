@@ -36,7 +36,7 @@ var StartDateOption LanPartyOption = LanPartyOption{
 			return "", errors.ErrUnsupported
 		}
 
-		return fmt.Sprintf("%s:%d", self.FileDeclaration, t.Unix()), nil
+		return fmt.Sprintf("%s:%d", Options[StartDate], t.Unix()), nil
 	},
 }
 

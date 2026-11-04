@@ -9,10 +9,12 @@ type ValidLanPartyOptionName int
 
 const (
 	StartDate ValidLanPartyOptionName = iota
+	GameListPath
 )
 
 var Options = map[ValidLanPartyOptionName]string{
-	StartDate: "start",
+	StartDate:    "start",
+	GameListPath: "gamelist",
 }
 
 var optionNames = func(m map[ValidLanPartyOptionName]string) map[string]ValidLanPartyOptionName {
@@ -40,6 +42,8 @@ func GetOption(optionDeclaration ValidLanPartyOptionName) *LanPartyOption {
 	switch optionDeclaration {
 	case StartDate:
 		return &StartDateOption
+	case GameListPath:
+		return &GameListPathOption
 	default:
 		return nil
 	}
