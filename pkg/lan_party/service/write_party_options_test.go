@@ -5,6 +5,7 @@ import (
 	lp "lanyard/pkg/lan_party"
 	opts "lanyard/pkg/lan_party/options"
 	"os"
+	"path/filepath"
 	"testing"
 	"time"
 )
@@ -80,5 +81,56 @@ func TestConfigRestoredWhenUpdateFails(t *testing.T) {
 
 	if sd != want {
 		t.Error("wanted: ", want, "; got: ", sd)
+	}
+}
+
+func TestWriteGameListPathOption(t *testing.T) {
+	testConfig := &cfg.AppConfig{LanPartyDataPath: testFilePath}
+	CreateConfigFile(testConfig)
+	t.Cleanup(func() {
+		os.Remove(testFilePath)
+		os.Remove(testFilePath + ".old")
+	})
+
+	absolutePath := "/tmp/test_game_list"
+
+	got := UpdateConfig(testConfig, lp.LanParty{
+		Options: map[string]any{opts.Options[opts.GameListPath]: absolutePath},
+	})
+	if got != nil {
+		t.Error(got)
+	}
+
+	lp, err := LoadConfig(testConfig)
+	if err != nil {
+		t.Fatalf("failed to load config: %v", err)
+	}
+
+	want := absolutePath
+	if gotVal, ok := lp.Options[opts.Options[opts.GameListPath]]; !ok || gotVal != want {
+		t.Errorf("wanted: %v; got: %v", want, gotVal)
+	}
+}
+
+func TestWriteRelativeGameListPathOptionFails(t *testing.T) {
+	testConfig := &cfg.AppConfig{LanPartyDataPath: testFilePath}
+	CreateConfigFile(testConfig)
+	t.Cleanup(func() {
+		os.Remove(testFilePath)
+		os.Remove(testFilePath + ".old")
+	})
+
+	relativePath := "./game_list"
+
+	got := UpdateConfig(testConfig, lp.LanParty{
+		Options: map[string]any{opts.Options[opts.GameListPath]: relativePath},
+	})
+
+	if got == nil {
+		t.Fatal("expected an error when writing a relative path, got nil")
+	}
+
+	if got != filepath.ErrBadPattern {
+		t.Errorf("expected error %v, got %v", filepath.ErrBadPattern, got)
 	}
 }

@@ -140,7 +140,7 @@ func loadConfig(appConfig *cfg.AppConfig) *lp.LanParty {
 
 	settings, loadError := service.LoadConfig(appConfig)
 	if os.IsNotExist(loadError) {
-		fmt.Println("config does not exist. crete one with 'lanyard party create'")
+		fmt.Println("config does not exist. create one with 'lanyard party create'")
 		return nil
 	} else if loadError != nil {
 		log.Print("failed to load config, please try again: ", loadError.Error())

@@ -12,7 +12,7 @@ import (
 var StartDateOption LanPartyOption = LanPartyOption{
 	Options[StartDate],
 
-	func(lp *lp.LanParty, v any) error {
+	func(lanp *lp.LanParty, v any) error {
 		if v == nil {
 			return errors.ErrUnsupported
 		}
@@ -22,11 +22,11 @@ var StartDateOption LanPartyOption = LanPartyOption{
 			return err
 		}
 
-		lp.Options[Options[StartDate]] = t
+		lanp.Options[Options[StartDate]] = t
 		return nil
 	},
 
-	func(v any, self *LanPartyOption) (string, error) {
+	func(v any) (string, error) {
 		if v == nil {
 			return "", errors.ErrUnsupported
 		}
@@ -36,7 +36,7 @@ var StartDateOption LanPartyOption = LanPartyOption{
 			return "", errors.ErrUnsupported
 		}
 
-		return fmt.Sprintf("%s:%d", self.FileDeclaration, t.Unix()), nil
+		return fmt.Sprintf("%d", t.Unix()), nil
 	},
 }
 
