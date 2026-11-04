@@ -1,8 +1,9 @@
-package lanpartyoptions
+package service
 
 import (
-	commontypes "lanyard/pkg/common_types"
-	"lanyard/pkg/lan_party_options/options"
+	cfg "lanyard/pkg/config"
+	lp "lanyard/pkg/lan_party"
+	opts "lanyard/pkg/lan_party/options"
 	"os"
 	"testing"
 	"time"
@@ -16,7 +17,7 @@ func TestCreateConfigFileSuccess(t *testing.T) {
 		os.Remove(testFilePath)
 	})
 
-	got := CreateConfigFile(&commontypes.AppConfig{LanPartyDataPath: testFilePath})
+	got := CreateConfigFile(&cfg.AppConfig{LanPartyDataPath: testFilePath})
 	if got != nil {
 		t.Error("failed to create the test file")
 	}
@@ -28,30 +29,30 @@ func TestNoFailureIfFileExists(t *testing.T) {
 		os.Remove(testFilePath)
 	})
 
-	got := CreateConfigFile(&commontypes.AppConfig{LanPartyDataPath: testFilePath})
+	got := CreateConfigFile(&cfg.AppConfig{LanPartyDataPath: testFilePath})
 	if got != nil {
 		t.Error("error was thrown when trying to create existing file")
 	}
 }
 
 func TestWriteStartDateOption(t *testing.T) {
-	testConfig := &commontypes.AppConfig{LanPartyDataPath: testFilePath}
+	testConfig := &cfg.AppConfig{LanPartyDataPath: testFilePath}
 	CreateConfigFile(testConfig)
 	t.Cleanup(func() {
 		os.Remove(testFilePath)
 		os.Remove(testFilePath + ".old")
 	})
 
-	got := UpdateConfig(testConfig, commontypes.LanParty{Options: map[string]any{options.Options[options.StartDate]: time.Unix(1793383526, 0)}})
+	got := UpdateConfig(testConfig, lp.LanParty{Options: map[string]any{opts.Options[opts.StartDate]: time.Unix(1793383526, 0)}})
 	if got != nil {
 		t.Error(got)
 	}
 }
 
 func TestConfigRestoredWhenUpdateFails(t *testing.T) {
-	testConfig := &commontypes.AppConfig{LanPartyDataPath: testFilePath}
+	testConfig := &cfg.AppConfig{LanPartyDataPath: testFilePath}
 	CreateConfigFile(testConfig)
-	setup := UpdateConfig(testConfig, commontypes.LanParty{Options: map[string]any{options.Options[options.StartDate]: time.Unix(1793383526, 0)}})
+	setup := UpdateConfig(testConfig, lp.LanParty{Options: map[string]any{opts.Options[opts.StartDate]: time.Unix(1793383526, 0)}})
 	if setup != nil {
 		t.Error("failed to set up the test files")
 	}
@@ -60,7 +61,7 @@ func TestConfigRestoredWhenUpdateFails(t *testing.T) {
 		os.Remove(testFilePath + ".old")
 	})
 
-	failedUpdate := UpdateConfig(testConfig, commontypes.LanParty{Options: map[string]any{options.Options[options.StartDate]: "invalid"}})
+	failedUpdate := UpdateConfig(testConfig, lp.LanParty{Options: map[string]any{opts.Options[opts.StartDate]: "invalid"}})
 	if failedUpdate == nil {
 		t.Error(failedUpdate)
 	}
@@ -74,7 +75,7 @@ func TestConfigRestoredWhenUpdateFails(t *testing.T) {
 		t.Error(err)
 	}
 
-	sd := lp.Options[options.Options[options.StartDate]]
+	sd := lp.Options[opts.Options[opts.StartDate]]
 	want := time.Unix(1793383526, 0)
 
 	if sd != want {

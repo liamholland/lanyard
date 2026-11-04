@@ -3,7 +3,7 @@ package options
 import (
 	"errors"
 	"fmt"
-	types "lanyard/pkg/common_types"
+	lp "lanyard/pkg/lan_party"
 	"log"
 	"strconv"
 	"time"
@@ -12,7 +12,7 @@ import (
 var StartDateOption LanPartyOption = LanPartyOption{
 	Options[StartDate],
 
-	func(lp *types.LanParty, v any) error {
+	func(lp *lp.LanParty, v any) error {
 		if v == nil {
 			return errors.ErrUnsupported
 		}
