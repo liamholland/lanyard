@@ -39,7 +39,7 @@ func ResolveGameListFromMap(gl *GameList, games map[string]int64, resolvedGames 
 	namesForMatching := func() map[string]string {
 		m := make(map[string]string)
 		for g := range games {
-			m[strings.ToLower(strings.ReplaceAll(g, " ", ""))] = g
+			m[encodedGameName(g)] = g
 		}
 		return m
 	}()
@@ -56,7 +56,7 @@ func ResolveGameListFromMap(gl *GameList, games map[string]int64, resolvedGames 
 			continue
 		}
 
-		encodedG := strings.ToLower(strings.ReplaceAll(g, " ", ""))
+		encodedG := encodedGameName(g)
 		if n, ok := namesForMatching[encodedG]; !ok {
 			continue
 		} else if games[n] < minimumFileSizeToBeGame {
@@ -81,7 +81,7 @@ func resolveGameAtPath(game string, path string) bool {
 			continue
 		}
 
-		if !strings.EqualFold(strings.ReplaceAll(game, " ", ""), strings.ReplaceAll(d.Name(), " ", "")) {
+		if !strings.EqualFold(encodedGameName(game), encodedGameName(d.Name())) {
 			continue
 		}
 
@@ -135,4 +135,8 @@ func guessBasedOnDirectorySize(path string, minSize int64) (bool, error) {
 	}
 
 	return false, nil
+}
+
+func encodedGameName(game string) string {
+	return strings.ToLower(strings.ReplaceAll(game, " ", ""))
 }
