@@ -93,7 +93,7 @@ func resolveFromPath(listPath string, gamePaths []string) {
 		return
 	}
 
-	resolvedGames := service.ResolveGameList(gl, gamePaths)
+	resolvedGames := service.ResolveGameListFromPaths(gl, gamePaths)
 	if resolvedGames == nil {
 		log.Print("error occurred during game resolution")
 		return
@@ -103,7 +103,7 @@ func resolveFromPath(listPath string, gamePaths []string) {
 }
 
 func resolveFromSetting(config *cfg.AppConfig, gamePaths []string) {
-	fp := getGameListPathFromSetting(&appConfig)
+	fp := getGameListPathFromSetting(config)
 	resolveFromPath(fp, gamePaths)
 }
 

@@ -10,7 +10,7 @@ import (
 
 const minimumFileSizeToBeGame = 50 * 1000 * 1000 // 50MB
 
-func ResolveGameList(gl *GameList, paths []string) *GameListResolution {
+func ResolveGameListFromPaths(gl *GameList, paths []string) *GameListResolution {
 	resolution := make(GameListResolution)
 
 	for _, p := range paths {
@@ -27,6 +27,43 @@ func ResolveGameList(gl *GameList, paths []string) *GameListResolution {
 		for _, g := range unresolvedGames {
 			resolution[g] = resolveGameAtPath(g, p)
 		}
+	}
+
+	return &resolution
+}
+
+func ResolveGameListFromMap(gl *GameList, games map[string]int64, resolvedGames map[string]bool) *GameListResolution {
+	log.Print("starting game resolution for game list")
+
+	resolution := make(GameListResolution)
+	namesForMatching := func() map[string]string {
+		m := make(map[string]string)
+		for g := range games {
+			m[strings.ToLower(strings.ReplaceAll(g, " ", ""))] = g
+		}
+		return m
+	}()
+
+	for _, g := range *gl {
+		resolution[g] = func() bool {
+			if r, ok := resolvedGames[g]; ok && r {
+				return true
+			}
+			return false
+		}()
+
+		if resolution[g] {
+			continue
+		}
+
+		encodedG := strings.ToLower(strings.ReplaceAll(g, " ", ""))
+		if n, ok := namesForMatching[encodedG]; !ok {
+			continue
+		} else if games[n] < minimumFileSizeToBeGame {
+			continue
+		}
+
+		resolution[g] = true
 	}
 
 	return &resolution
