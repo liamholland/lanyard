@@ -5,6 +5,7 @@ import (
 	"errors"
 	"io/fs"
 	cfg "lanyard/pkg/config"
+	games "lanyard/server/internal/controllers/gamelist"
 	hc "lanyard/server/internal/controllers/health"
 	partyTime "lanyard/server/internal/controllers/time"
 	"lanyard/server/internal/store"
@@ -21,17 +22,20 @@ func Start(appConfig *cfg.AppConfig) {
 
 	store.InitPartyConfig(appConfig)
 
-	http.HandleFunc(hc.BasePath, hc.HealthCheck)
-	http.HandleFunc(partyTime.BasePath+"/start", partyTime.GetStartTime)
+	mux := http.NewServeMux()
+
+	mux.HandleFunc(hc.BasePath, hc.HealthCheck)
+	mux.HandleFunc(partyTime.BasePath+"/start", partyTime.GetStartTime)
+	mux.HandleFunc(games.BasePath+"/resolve", games.ResolveGames)
 
 	subFS, htmlPathErr := fs.Sub(lanyardFs, "lanyard")
 	if htmlPathErr != nil {
 		log.Fatal("failed to create paths for webpage:", htmlPathErr)
 	}
 	webPageHandler := http.StripPrefix("/lanyard/", http.FileServer(http.FS(subFS)))
-	http.Handle("/lanyard/", webPageHandler)
+	mux.Handle("/lanyard/", webPageHandler)
 
-	err := http.ListenAndServe(":"+strconv.Itoa(appConfig.ServerPort), nil)
+	err := http.ListenAndServe(":"+strconv.Itoa(appConfig.ServerPort), mux)
 	if errors.Is(err, http.ErrServerClosed) {
 		log.Println("server closed")
 	} else if err != nil {

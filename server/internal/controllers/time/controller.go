@@ -20,7 +20,7 @@ func GetStartTime(w http.ResponseWriter, r *http.Request) {
 
 	optionValue := options.GetOptionValue(store.GetPartyConfig(), options.StartDate)
 	if optionValue == nil {
-		w.WriteHeader(http.StatusNotFound)
+		http.Error(w, "no value found for start date option", http.StatusNotFound)
 		return
 	}
 

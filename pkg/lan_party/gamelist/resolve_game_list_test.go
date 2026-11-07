@@ -75,7 +75,7 @@ func TestResolveGameAtPath(t *testing.T) {
 func TestResolveGameList(t *testing.T) {
 	games := GameList{noGame, deletedGame, game}
 
-	resolution := *ResolveGameList(&games, []string{testDir})
+	resolution := *ResolveGameListFromPaths(&games, []string{testDir})
 
 	if len(resolution) < len(games) {
 		t.Error("not all games were returned in resolution")

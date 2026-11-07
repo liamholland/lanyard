@@ -24,6 +24,7 @@ var startServerCmd = &cobra.Command{
 
 func init() {
 	serverCmd.PersistentFlags().IntVarP(&GetAppConfig().ServerPort, "port", "p", 1311, "set the port on which to run the server")
+	serverCmd.PersistentFlags().StringVarP(&GetAppConfig().LanPartyDataPath, "config", "P", "party_config", "the path of the config to use")
 
 	serverCmd.AddCommand(startServerCmd)
 	rootCmd.AddCommand(serverCmd)

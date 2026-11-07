@@ -6,12 +6,40 @@
 <body>
     <h1>Countdown to Start Time</h1>
     <p id="timer">Loading...</p>
+    <p id="status">Ready</p>
 
     <script src="./partyTime.js"></script>
+    <script src="./gamelist.js"></script>
     <script type="module">
         getStartTime().then(startTime => {
             const timerElement = document.getElementById('timer');
             setInterval(() => timerElement.textContent = formattedCountdown(startTime), 1000);
+        });
+    </script>
+
+    <input type="file" id="file-picker" name="fileList" webkitdirectory multiple />
+    <pre id="result"></pre>
+    <script>
+        var preResolvedGames = retrieveResolvedGames();
+        if (preResolvedGames !== null) {
+            const resultElement = document.getElementById('result');
+            resultElement.textContent = JSON.stringify(preResolvedGames, null, 2);
+        }
+
+        document.getElementById("file-picker").addEventListener("click", (event) => {
+            const statusElement = document.getElementById('status');
+            statusElement.textContent = "scanning...";
+        });
+        document.getElementById("file-picker").addEventListener("change", (event) => {
+            const statusElement = document.getElementById('status');
+            const resultElement = document.getElementById('result');
+            let sizeMap = aggregateGames(event.target.files);
+            statusElement.textContent = "scan complete";
+            event.target.value = '';
+            resolveGames(sizeMap, retrieveResolvedGames()).then(res => {
+                resultElement.textContent = JSON.stringify(res, null, 2);
+                persistResolvedGames(res);
+            });
         });
     </script>
 </body>
