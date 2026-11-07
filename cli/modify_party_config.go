@@ -49,8 +49,6 @@ var updateSettingValueCommand = &cobra.Command{
 }
 
 func init() {
-	partyConfigCommand.PersistentFlags().StringVarP(&GetAppConfig().LanPartyDataPath, "path", "p", "party_config", "the path of the config to use")
-
 	partyConfigCommand.AddCommand(createConfigFileCommand)
 	partyConfigCommand.AddCommand(getSettingValueCommand)
 	partyConfigCommand.AddCommand(updateSettingValueCommand)

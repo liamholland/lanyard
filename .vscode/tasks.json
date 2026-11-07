@@ -23,7 +23,7 @@
 		{
 			"type": "shell",
 			"label": "build and start server",
-			"command": "builds/ly server -v start",
+			"command": "builds/ly server -v -P builds/config start",
 			"presentation": {
 				"echo": true,
 				"reveal": "always",

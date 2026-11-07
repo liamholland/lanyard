@@ -4,7 +4,7 @@
             "name": "Launch Integrated Browser",
             "request": "launch",
             "type": "editor-browser",
-            "url": "http://localhost:1311/static/ly.html",
+            "url": "http://localhost:1311/lanyard/",
             "webRoot": "${workspaceFolder}",
             "preLaunchTask": "build and start server",
         }

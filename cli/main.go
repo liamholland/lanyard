@@ -25,6 +25,7 @@ var appConfig cfg.AppConfig = cfg.AppConfig{
 
 func init() {
 	rootCmd.PersistentFlags().BoolVarP(&appConfig.VerboseMode, "verbose", "v", false, "configure the application to run in verbose mode")
+	rootCmd.PersistentFlags().StringVarP(&GetAppConfig().LanPartyDataPath, "path", "P", "party_config", "the path of the config to use")
 }
 
 func main() {
