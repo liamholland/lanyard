@@ -43,7 +43,7 @@ var StartDateOption LanPartyOption = LanPartyOption{
 func parseValidPOSIXTimestamp(v any) (time.Time, error) {
 	i, err := strconv.ParseInt(v.(string), 10, 64)
 	if err != nil {
-		log.Print(v, " is not a valid POSIX timestamp")
+		log.Print(v, " is not a valid POSIX timestamp:", err)
 		return time.Time{}, errors.ErrUnsupported
 	}
 	return time.Unix(i, 0), nil
