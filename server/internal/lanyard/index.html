@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Lanyard</title>
+</head>
+<body>
+    <h1>Countdown to Start Time</h1>
+    <p id="timer">Loading...</p>
+
+    <script src="./partyTime.js"></script>
+    <script type="module">
+        getStartTime().then(startTime => {
+            const timerElement = document.getElementById('timer');
+            setInterval(() => timerElement.textContent = formattedCountdown(startTime), 1000);
+        });
+    </script>
+</body>
+</html>
