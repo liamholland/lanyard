@@ -23,6 +23,7 @@ func Start(appConfig *cfg.AppConfig) {
 	log.Print("starting server on port ", appConfig.ServerPort)
 
 	store.InitPartyConfig(appConfig)
+	store.InitIdentities()
 
 	mux := http.NewServeMux()
 
@@ -43,8 +44,9 @@ func Start(appConfig *cfg.AppConfig) {
 	mux.Handle("/lanyard/", webPageHandler)
 
 	loggedMux := middleware.LoggingMiddleware(mux)
+	identityStampedMux := middleware.IdentityStampedMiddleware(loggedMux)
 
-	err := http.ListenAndServe(":"+strconv.Itoa(appConfig.ServerPort), loggedMux)
+	err := http.ListenAndServe(":"+strconv.Itoa(appConfig.ServerPort), identityStampedMux)
 	if errors.Is(err, http.ErrServerClosed) {
 		log.Println("server closed")
 	} else if err != nil {

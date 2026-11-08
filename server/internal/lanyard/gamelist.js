@@ -39,7 +39,8 @@ async function resolveGames(gamesMap, resolvedGames) {
         method: "post",
         headers: {
             "Accept": "application/json",
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "Lanyard-Identity": getUserId()
         },
         body: JSON.stringify({
             "games": gamesMap,
