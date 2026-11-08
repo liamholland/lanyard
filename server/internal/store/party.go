@@ -18,6 +18,10 @@ func GetPartyConfig() *lp.LanParty {
 	return &lanParty
 }
 
+func SetPartyConfig(newSettings *lp.LanParty) {
+	lanParty = *newSettings
+}
+
 func loadConfig(appConfig *cfg.AppConfig) *lp.LanParty {
 	settings, loadError := service.LoadConfig(appConfig)
 	if os.IsNotExist(loadError) {

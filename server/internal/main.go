@@ -7,6 +7,7 @@ import (
 	cfg "lanyard/pkg/config"
 	games "lanyard/server/internal/controllers/gamelist"
 	hc "lanyard/server/internal/controllers/health"
+	"lanyard/server/internal/controllers/options"
 	partyTime "lanyard/server/internal/controllers/time"
 	"lanyard/server/internal/middleware"
 	"lanyard/server/internal/store"
@@ -30,6 +31,9 @@ func Start(appConfig *cfg.AppConfig) {
 	mux.HandleFunc(partyTime.BasePath+"/departure", partyTime.AddDepartureTime)
 	mux.HandleFunc(partyTime.BasePath+"/howmany", partyTime.GetHowManyAtTime)
 	mux.HandleFunc(games.BasePath+"/resolve", games.ResolveGames)
+
+	// admin control endpoints - only localhost accepted
+	mux.HandleFunc(options.BasePath+"/update", options.UpdateOption)
 
 	subFS, htmlPathErr := fs.Sub(lanyardFs, "lanyard")
 	if htmlPathErr != nil {
