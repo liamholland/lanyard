@@ -10,11 +10,13 @@
 
     <script src="./partyTime.js"></script>
     <script src="./gamelist.js"></script>
+    <script src="./identity.js"></script>
     <script type="module">
         getStartTime().then(startTime => {
             const timerElement = document.getElementById('timer');
             setInterval(() => timerElement.textContent = formattedCountdown(startTime), 1000);
         });
+        createUserId();
     </script>
 
     <input type="datetime-local" id="time-picker"/><br>
@@ -25,7 +27,7 @@
     <pre id="result"></pre>
 
     <script>
-        var preResolvedGames = retrieveResolvedGames();
+        let preResolvedGames = retrieveResolvedGames();
         if (preResolvedGames !== null) {
             const resultElement = document.getElementById('result');
             resultElement.textContent = JSON.stringify(preResolvedGames, null, 2);

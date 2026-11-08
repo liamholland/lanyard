@@ -12,7 +12,8 @@ async function addDepartureTime(time) {
         method: 'post',
         headers: {
             "Accept": "application/json",
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "Lanyard-Identity": getUserId()
         },
         body: JSON.stringify({
             "time": time,
