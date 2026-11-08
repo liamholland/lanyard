@@ -8,6 +8,7 @@ import (
 	games "lanyard/server/internal/controllers/gamelist"
 	hc "lanyard/server/internal/controllers/health"
 	partyTime "lanyard/server/internal/controllers/time"
+	"lanyard/server/internal/middleware"
 	"lanyard/server/internal/store"
 	"log"
 	"net/http"
@@ -26,6 +27,8 @@ func Start(appConfig *cfg.AppConfig) {
 
 	mux.HandleFunc(hc.BasePath, hc.HealthCheck)
 	mux.HandleFunc(partyTime.BasePath+"/start", partyTime.GetStartTime)
+	mux.HandleFunc(partyTime.BasePath+"/departure", partyTime.AddDepartureTime)
+	mux.HandleFunc(partyTime.BasePath+"/howmany", partyTime.GetHowManyAtTime)
 	mux.HandleFunc(games.BasePath+"/resolve", games.ResolveGames)
 
 	subFS, htmlPathErr := fs.Sub(lanyardFs, "lanyard")
@@ -35,7 +38,9 @@ func Start(appConfig *cfg.AppConfig) {
 	webPageHandler := http.StripPrefix("/lanyard/", http.FileServer(http.FS(subFS)))
 	mux.Handle("/lanyard/", webPageHandler)
 
-	err := http.ListenAndServe(":"+strconv.Itoa(appConfig.ServerPort), mux)
+	loggedMux := middleware.LoggingMiddleware(mux)
+
+	err := http.ListenAndServe(":"+strconv.Itoa(appConfig.ServerPort), loggedMux)
 	if errors.Is(err, http.ErrServerClosed) {
 		log.Println("server closed")
 	} else if err != nil {
