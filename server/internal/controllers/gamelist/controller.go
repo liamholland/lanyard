@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	gl "lanyard/pkg/lan_party/gamelist"
 	opts "lanyard/pkg/lan_party/options"
-	"lanyard/server/internal/logging"
 	"lanyard/server/internal/store"
 	"net/http"
 )
@@ -17,8 +16,6 @@ type GameResolutionRequest struct {
 }
 
 func ResolveGames(w http.ResponseWriter, r *http.Request) {
-	logging.LogControllerRequest(BasePath+"/resolve", "POST", r.RemoteAddr)
-
 	if r.Method != http.MethodPost {
 		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
 		return

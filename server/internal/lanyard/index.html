@@ -17,8 +17,13 @@
         });
     </script>
 
+    <input type="datetime-local" id="time-picker"/><br>
+    <button id="departure-setter">set departure time</button><br>
+    <button id="num-people-getter">query player numbers</button><br>
+
     <input type="file" id="file-picker" name="fileList" webkitdirectory multiple />
     <pre id="result"></pre>
+
     <script>
         var preResolvedGames = retrieveResolvedGames();
         if (preResolvedGames !== null) {
@@ -30,6 +35,7 @@
             const statusElement = document.getElementById('status');
             statusElement.textContent = "scanning...";
         });
+
         document.getElementById("file-picker").addEventListener("change", (event) => {
             const statusElement = document.getElementById('status');
             const resultElement = document.getElementById('result');
@@ -39,6 +45,23 @@
             resolveGames(sizeMap, retrieveResolvedGames()).then(res => {
                 resultElement.textContent = JSON.stringify(res, null, 2);
                 persistResolvedGames(res);
+            });
+        });
+
+        document.getElementById("departure-setter").addEventListener("click", (event) => {
+            let cal = document.getElementById("time-picker");
+            let posixTime = posixTimeFromDate(cal.value);
+            addDepartureTime(posixTime).then(res => {
+                console.log('uploaded time: ', posixTime);
+            });
+        });
+
+        document.getElementById("num-people-getter").addEventListener("click", (event) => {
+            let cal = document.getElementById("time-picker");
+            let posixTime = posixTimeFromDate(cal.value);
+            getNumPlayers(posixTime).then(res => {
+                const resultElement = document.getElementById('result');
+                resultElement.textContent = `there will be ${res} players at ${cal.value}`;
             });
         });
     </script>
