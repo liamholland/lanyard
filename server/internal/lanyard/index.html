@@ -12,12 +12,33 @@
     <script src="./gamelist.js"></script>
     <script src="./identity.js"></script>
     <script type="module">
+        let registerDiv = document.getElementById("register-section");
+        let regStatus = document.getElementById("register-status");
+        registerDiv.style.display = 'none';
+
         getStartTime().then(startTime => {
             const timerElement = document.getElementById('timer');
             setInterval(() => timerElement.textContent = formattedCountdown(startTime), 1000);
         });
         createUserId();
+        retrieveUsername().then(res => {
+            if (res.length > 0) {
+                regStatus.textContent = `welcome back ${res}`;
+            } else {
+                regStatus.textContent = "enter a username below to register";
+                registerDiv.style.display = "block";
+            }
+        }).catch(e => {
+            regStatus.textContent = "enter a username below to register";
+            registerDiv.style.display = "block";
+        });
     </script>
+
+    <p id="register-status">Loading...</p>
+    <div id="register-section">
+        <input type="text" id="username-entry"/>
+        <button id="register-button">register</button><br>
+    </div>
 
     <input type="datetime-local" id="time-picker"/><br>
     <button id="departure-setter">set departure time</button><br>
@@ -64,6 +85,18 @@
             getNumPlayers(posixTime).then(res => {
                 const resultElement = document.getElementById('result');
                 resultElement.textContent = `there will be ${res} players at ${cal.value}`;
+            });
+        });
+
+        document.getElementById("register-button").addEventListener("click", (event) => {
+            let textBox = document.getElementById("username-entry");
+            let username = textBox.value;
+            registerUsername(username).then(res => {
+                let regSec = document.getElementById("register-section");
+                regSec.style.display = "none";
+                let regStatus = document.getElementById("register-status");
+                regStatus.textContent = `welcome ${username}`;
+                console.log("registered username: ", username);
             });
         });
     </script>

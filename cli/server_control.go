@@ -9,6 +9,7 @@ import (
 	server "lanyard/server/pkg"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/spf13/cobra"
 )
@@ -48,15 +49,39 @@ var updateServerSettingCmd = &cobra.Command{
 	},
 }
 
+var usersCmd = &cobra.Command{
+	Use:   "users",
+	Short: "interact with server user information",
+}
+
+var getUsersCmd = &cobra.Command{
+	Use:   "list",
+	Short: "list the users on the server",
+	Long:  "lists users on the server. returns their username and the ip at which the server last recorded them",
+	Run: func(cmd *cobra.Command, args []string) {
+		CheckVerboseMode(cmd)
+		IsServerUp()
+		GetUsers()
+	},
+}
+
 const serverLocation string = "http://localhost:1311"
+
+type ListUsersResponse struct {
+	Users map[string]string `json:"users"`
+}
 
 func init() {
 	serverCmd.PersistentFlags().IntVarP(&GetAppConfig().ServerPort, "port", "p", 1311, "set the port on which to run the server")
 	serverCmd.PersistentFlags().StringVarP(&GetAppConfig().LanPartyDataPath, "config", "P", "party_config", "the path of the config to use")
 
+	usersCmd.AddCommand(getUsersCmd)
+
 	serverCmd.AddCommand(startServerCmd)
 	serverCmd.AddCommand(serverStatusCmd)
 	serverCmd.AddCommand(updateServerSettingCmd)
+	serverCmd.AddCommand(usersCmd)
+
 	rootCmd.AddCommand(serverCmd)
 }
 
@@ -87,7 +112,7 @@ func IsServerUp() {
 }
 
 func UpdateServerSetting(optionName string, optionValue string) {
-	requestPath := serverLocation + "/options/update"
+	requestPath := serverLocation + "/admin/options/update"
 	requestBody := map[string]string{
 		"option": optionName,
 		"value":  optionValue,
@@ -111,4 +136,32 @@ func UpdateServerSetting(optionName string, optionValue string) {
 	}
 
 	fmt.Println("option updated on server")
+}
+
+func GetUsers() {
+	request := serverLocation + "/admin/users"
+	serverRes, serverErr := http.Get(request)
+	if serverErr != nil {
+		log.Fatal("user list fetch from server failed: ", serverErr)
+		return
+	}
+
+	if serverRes.StatusCode != 200 {
+		fmt.Println("failed to get users on server")
+		os.Exit(1)
+	}
+
+	defer serverRes.Body.Close()
+
+	var res ListUsersResponse
+
+	decodeErr := json.NewDecoder(serverRes.Body).Decode(&res)
+	if decodeErr != nil {
+		log.Fatal("server returned a malformed response")
+	}
+
+	fmt.Println("Current Users:")
+	for u, ip := range res.Users {
+		fmt.Printf("> %-20s%s\n", u, ip)
+	}
 }

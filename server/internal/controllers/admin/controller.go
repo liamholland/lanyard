@@ -1,7 +1,8 @@
-package options
+package admin
 
 import (
 	"encoding/json"
+	"fmt"
 	opts "lanyard/pkg/lan_party/options"
 	"lanyard/server/internal/store"
 	"log"
@@ -50,6 +51,31 @@ func UpdateOption(w http.ResponseWriter, r *http.Request) {
 
 	log.Print("settings successfully updated!")
 	w.WriteHeader(http.StatusOK)
+}
+
+func GetUsers(w http.ResponseWriter, r *http.Request) {
+	if !isFromLocalHost(r.RemoteAddr) {
+		http.Error(w, "ask the server admin to do this", http.StatusForbidden)
+		return
+	}
+
+	identities := store.GetUsers()
+	usernames := store.GetUsernames()
+
+	userIps := func() map[string]string {
+		m := make(map[string]string)
+		for id, name := range usernames {
+			m[name] = identities[fmt.Sprintf("%v", id)]
+		}
+		return m
+	}()
+
+	res := ListUsersResponse{Users: userIps}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+
+	json.NewEncoder(w).Encode(res)
 }
 
 func isFromLocalHost(addr string) bool {
