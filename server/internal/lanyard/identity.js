@@ -1,3 +1,42 @@
+async function registerUsername(name) {
+    const response = await fetch("/identity/register", {
+        method: "post",
+        headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+            "Lanyard-Identity": getUserId()
+        },
+        body: JSON.stringify({
+            "username": name,
+        })
+    });
+
+    if (!response.ok) {
+        throw new Error(`Network response was not ok:${response.statusText}`);
+    }
+}
+
+async function retrieveUsername() {
+    const response = await fetch("/identity/retrieve", {
+        method: "post",
+        headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+            "Lanyard-Identity": getUserId()
+        },
+        body: JSON.stringify({
+            "lanyardId": getUserId(),
+        })
+    });
+
+    if (!response.ok) {
+        throw new Error(`Network response was not ok:${response.statusText}`);
+    }
+
+    let res = await response.json();
+    return res.username;
+}
+
 function createUserId() {
     const foundId = localStorage.lanyardId;
     if (foundId !== undefined) {
