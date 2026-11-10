@@ -18,6 +18,18 @@ a suite of tools for running LAN parties
 
 ## Usage
 
+you can use
+```sh
+ly help
+```
+or
+```sh
+ly help [command path]
+```
+to get more information on any commands
+
+***
+
 create a party config
 ```sh
 ly party create
@@ -51,6 +63,22 @@ Half-Life #8
 ```
 the ideal player numbers can optionally be specified by adding `#[number]` next to the game name.
 
+### Running a server
+
+start the server with
+```sh
+ly server start
+```
+
+check its status with
+```sh
+ly server up
+```
+
+change settings of the config on the running server with
+```sh
+ly server update [setting] [value]
+```
 
 ***
 

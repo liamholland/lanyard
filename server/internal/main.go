@@ -39,6 +39,7 @@ func Start(appConfig *cfg.AppConfig) {
 	// admin control endpoints - only localhost accepted
 	mux.HandleFunc(admin.BasePath+"/options/update", admin.UpdateOption)
 	mux.HandleFunc(admin.BasePath+"/users", admin.GetUsers)
+	mux.HandleFunc(admin.BasePath+"/users/resolved", admin.GetUserResolutions)
 
 	subFS, htmlPathErr := fs.Sub(lanyardFs, "lanyard")
 	if htmlPathErr != nil {

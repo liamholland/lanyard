@@ -16,21 +16,23 @@
         let regStatus = document.getElementById("register-status");
         registerDiv.style.display = 'none';
 
-        getStartTime().then(startTime => {
-            const timerElement = document.getElementById('timer');
-            setInterval(() => timerElement.textContent = formattedCountdown(startTime), 1000);
-        });
-        createUserId();
         retrieveUsername().then(res => {
             if (res.length > 0) {
                 regStatus.textContent = `welcome back ${res}`;
             } else {
+                forgetUserId();
                 regStatus.textContent = "enter a username below to register";
                 registerDiv.style.display = "block";
             }
         }).catch(e => {
+            forgetUserId();
             regStatus.textContent = "enter a username below to register";
             registerDiv.style.display = "block";
+        });
+
+        getStartTime().then(startTime => {
+            const timerElement = document.getElementById('timer');
+            setInterval(() => timerElement.textContent = formattedCountdown(startTime), 1000);
         });
     </script>
 
@@ -91,6 +93,7 @@
         document.getElementById("register-button").addEventListener("click", (event) => {
             let textBox = document.getElementById("username-entry");
             let username = textBox.value;
+            createUserId();
             registerUsername(username).then(res => {
                 let regSec = document.getElementById("register-section");
                 regSec.style.display = "none";

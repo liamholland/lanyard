@@ -78,6 +78,36 @@ func GetUsers(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(res)
 }
 
+func GetUserResolutions(w http.ResponseWriter, r *http.Request) {
+	if !isFromLocalHost(r.RemoteAddr) {
+		http.Error(w, "ask the server admin to do this", http.StatusForbidden)
+		return
+	}
+
+	usernames := store.GetUsernames()
+	userResolutions := *store.GetUserResolutions()
+
+	matchedResolutions := func() map[string]map[string]bool {
+		m := make(map[string]map[string]bool)
+		for id, name := range usernames {
+			if storedR, ok := userResolutions[id]; ok {
+				m[name] = storedR
+			} else {
+				emptyResolution := make(map[string]bool)
+				m[name] = emptyResolution
+			}
+		}
+		return m
+	}()
+
+	res := ListUserResolutionsResponse{Resolutions: matchedResolutions}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+
+	json.NewEncoder(w).Encode(res)
+}
+
 func isFromLocalHost(addr string) bool {
 	log.Print("checking if ", addr, " is a local host")
 

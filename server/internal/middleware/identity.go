@@ -1,6 +1,8 @@
 package middleware
 
 import (
+	"context"
+	"lanyard/server/internal/controllers/gamelist"
 	"lanyard/server/internal/controllers/identity"
 	"lanyard/server/internal/store"
 	"log"
@@ -12,6 +14,7 @@ const LanyardIdentityHeader string = "Lanyard-Identity"
 var identityRequired map[string]bool = map[string]bool{
 	identity.BasePath + "/register": true,
 	identity.BasePath + "/retrieve": true,
+	gamelist.BasePath + "/resolve":  true,
 }
 
 func IdentityStampedMiddleware(next http.Handler) http.Handler {
@@ -20,6 +23,7 @@ func IdentityStampedMiddleware(next http.Handler) http.Handler {
 		if identityHeader != "" {
 			if identity := store.CheckIdentity(identityHeader, r.RemoteAddr); identity > -1 {
 				log.Print("request is from user with id: ", identity)
+				r = withIdentity(r, identity)
 			} else {
 				if _, ok := identityRequired[r.URL.Path]; ok {
 					http.Error(w, r.URL.Path+" requires an identity", http.StatusUnauthorized)
@@ -32,4 +36,9 @@ func IdentityStampedMiddleware(next http.Handler) http.Handler {
 
 		next.ServeHTTP(w, r)
 	})
+}
+
+func withIdentity(r *http.Request, identity int64) *http.Request {
+	identityCtx := context.WithValue(r.Context(), "lan-id", identity)
+	return r.WithContext(identityCtx)
 }

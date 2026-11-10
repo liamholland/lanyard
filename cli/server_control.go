@@ -6,10 +6,12 @@ import (
 	"fmt"
 	"io"
 	cfg "lanyard/pkg/config"
+	service "lanyard/pkg/lan_party/gamelist"
 	server "lanyard/server/pkg"
 	"log"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/spf13/cobra"
 )
@@ -65,10 +67,37 @@ var getUsersCmd = &cobra.Command{
 	},
 }
 
+var getUserResolutionsCmd = &cobra.Command{
+	Use:   "blame",
+	Short: "display the status of users' resolved games",
+	Long:  "display the status of each registered user and the games they have resolved with the server. lets you blame someone for not being prepared",
+	Run: func(cmd *cobra.Command, args []string) {
+		CheckVerboseMode(cmd)
+		IsServerUp()
+		GetUserResolutionStatus()
+	},
+}
+
+var getGameResolutionStatus = &cobra.Command{
+	Use:   "status",
+	Short: "check the resolution status for a game",
+	Long:  "check the resolution status for a game across all users on the server. takes the game name as an argument",
+	Args:  cobra.ExactArgs(1),
+	Run: func(cmd *cobra.Command, args []string) {
+		CheckVerboseMode(cmd)
+		IsServerUp()
+		GetResolutionStatusForGame(args[0])
+	},
+}
+
 const serverLocation string = "http://localhost:1311"
 
 type ListUsersResponse struct {
 	Users map[string]string `json:"users"`
+}
+
+type ListUserResolutionsResponse struct {
+	Resolutions map[string]service.GameListResolution `json:"resolutions"`
 }
 
 func init() {
@@ -76,6 +105,8 @@ func init() {
 	serverCmd.PersistentFlags().StringVarP(&GetAppConfig().LanPartyDataPath, "config", "P", "party_config", "the path of the config to use")
 
 	usersCmd.AddCommand(getUsersCmd)
+	usersCmd.AddCommand(getUserResolutionsCmd)
+	usersCmd.AddCommand(getGameResolutionStatus)
 
 	serverCmd.AddCommand(startServerCmd)
 	serverCmd.AddCommand(serverStatusCmd)
@@ -163,5 +194,84 @@ func GetUsers() {
 	fmt.Println("Current Users:")
 	for u, ip := range res.Users {
 		fmt.Printf("> %-20s%s\n", u, ip)
+	}
+}
+
+func GetUserResolutionStatus() {
+	request := serverLocation + "/admin/users/resolved"
+	serverRes, serverErr := http.Get(request)
+	if serverErr != nil {
+		log.Fatal("user list fetch from server failed: ", serverErr)
+		return
+	}
+
+	if serverRes.StatusCode != 200 {
+		fmt.Println("failed to get users on server")
+		os.Exit(1)
+	}
+
+	defer serverRes.Body.Close()
+
+	var res ListUserResolutionsResponse
+
+	decodeErr := json.NewDecoder(serverRes.Body).Decode(&res)
+	if decodeErr != nil {
+		log.Fatal("server returned a malformed response")
+	}
+
+	fmt.Println("Current User Game Status:")
+	for u, r := range res.Resolutions {
+		fmt.Printf("\n> %s:\n", u)
+		if len(r) > 0 {
+			displayGameResolution(&r)
+		} else {
+			fmt.Println("no resolution status!")
+		}
+	}
+}
+
+func GetResolutionStatusForGame(game string) {
+	request := serverLocation + "/admin/users/resolved"
+	serverRes, serverErr := http.Get(request)
+	if serverErr != nil {
+		log.Fatal("user list fetch from server failed: ", serverErr)
+		return
+	}
+
+	if serverRes.StatusCode != 200 {
+		fmt.Println("failed to get users on server")
+		os.Exit(1)
+	}
+
+	defer serverRes.Body.Close()
+
+	var res ListUserResolutionsResponse
+
+	decodeErr := json.NewDecoder(serverRes.Body).Decode(&res)
+	if decodeErr != nil {
+		log.Fatal("server returned a malformed response")
+	}
+
+	var gameStatus = make(map[string]bool)
+	var unknown = make([]string, 0)
+
+	for u, r := range res.Resolutions {
+		if uGameStatus, ok := r[game]; ok {
+			gameStatus[u] = uGameStatus
+		} else {
+			unknown = append(unknown, u)
+		}
+	}
+
+	if len(unknown) == len(res.Resolutions) {
+		log.Print("failed to resolve any data on game ", game, " for any users")
+		fmt.Println("no resolution data for '", game, "'. are you sure its spelled correctly?")
+		fmt.Println("use 'gamelist show' to list the games on the game list")
+	} else {
+		fmt.Printf("result of game resolution for %s:\n", game)
+		displayGameResolution((*service.GameListResolution)(&gameStatus))
+		if len(unknown) > 0 {
+			fmt.Println("users with no resolution: ", strings.Join(unknown, ", "))
+		}
 	}
 }

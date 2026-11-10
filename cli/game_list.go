@@ -99,6 +99,7 @@ func resolveFromPath(listPath string, gamePaths []string) {
 		return
 	}
 
+	fmt.Println("result of game resolution:")
 	displayGameResolution(resolvedGames)
 }
 
@@ -108,7 +109,6 @@ func resolveFromSetting(config *cfg.AppConfig, gamePaths []string) {
 }
 
 func displayGameResolution(gameRes *service.GameListResolution) {
-	fmt.Println("result of game resolution:")
 	for g, r := range *gameRes {
 		if g == "" {
 			continue
