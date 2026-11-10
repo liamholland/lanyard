@@ -22,7 +22,7 @@ func IdentityStampedMiddleware(next http.Handler) http.Handler {
 				log.Print("request is from user with id: ", identity)
 			} else {
 				if _, ok := identityRequired[r.URL.Path]; ok {
-					http.Error(w, r.URL.Path+" requires an identity", http.StatusForbidden)
+					http.Error(w, r.URL.Path+" requires an identity", http.StatusUnauthorized)
 					return
 				}
 
