@@ -5,6 +5,7 @@ import (
 	gl "lanyard/pkg/lan_party/gamelist"
 	opts "lanyard/pkg/lan_party/options"
 	"lanyard/server/internal/store"
+	"log"
 	"net/http"
 )
 
@@ -42,6 +43,13 @@ func ResolveGames(w http.ResponseWriter, r *http.Request) {
 	}
 
 	resolution := gl.ResolveGameListFromMap(list, req.Games, req.Resolved)
+
+	ctxId := r.Context().Value("lan-id")
+	if userId, ok := ctxId.(int64); ok {
+		store.UpdateUserResolution(userId, *resolution)
+	} else {
+		log.Print("user id on context is invalid, skipping save of user resolution: ", ctxId)
+	}
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)

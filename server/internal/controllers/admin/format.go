@@ -10,3 +10,7 @@ type OptionUpdateRequest struct {
 type ListUsersResponse struct {
 	Users map[string]string `json:"users"`
 }
+
+type ListUserResolutionsResponse struct {
+	Resolutions map[string]map[string]bool `json:"resolutions"`
+}
