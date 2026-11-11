@@ -28,11 +28,15 @@ func Start(appConfig *cfg.AppConfig) {
 
 	mux := http.NewServeMux()
 
-	mux.HandleFunc(hc.BasePath, hc.HealthCheck)
+	mux.HandleFunc(paths.HealthCheckPath, hc.HealthCheck)
+
 	mux.HandleFunc(paths.TimeStartPath, partyTime.GetStartTime)
 	mux.HandleFunc(paths.TimeDepPath, partyTime.AddDepartureTime)
 	mux.HandleFunc(paths.TimeHowManyPath, partyTime.GetHowManyAtTime)
+	mux.HandleFunc(paths.TimeGameIdealWhenPath, partyTime.GetWhenToPlayGame)
+
 	mux.HandleFunc(paths.GamesResolvePath, games.ResolveGames)
+
 	mux.HandleFunc(paths.IdentityRegisterPath, identity.CreateUsername)
 	mux.HandleFunc(paths.IdentityRetrievePath, identity.RetrieveUsername)
 

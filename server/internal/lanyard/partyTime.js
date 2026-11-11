@@ -38,6 +38,31 @@ async function getNumPlayers(time) {
     return res.numPeople;
 }
 
+async function getTimeForGame(g) {
+    const response = await fetch(`/time/ideal?game=${g}`);
+
+    if (!response.ok) {
+        throw new Error(`Network response was not ok:${response.statusText}:${JSON.stringify(response.headers)}`);
+    }
+
+    const res = await response.json();
+    return res.time;
+}
+
+function formatTimeAndDay(t) {
+    const date = new Date(t * 1000);
+
+    const options = { weekday: 'long' };
+    const day = date.toLocaleDateString('en-US', options);
+
+    const hours = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+
+    const time = `${hours}:${minutes}`;
+
+    return `${day} ${time}`;
+}
+
 function formattedCountdown(startTime) {
     const now = new Date();
     const differenceMs = startTime.getTime() - now.getTime();

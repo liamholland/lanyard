@@ -3,6 +3,7 @@ package time
 import (
 	"encoding/json"
 	"lanyard/pkg/lan_party/departures"
+	"lanyard/pkg/lan_party/gamelist"
 	"lanyard/pkg/lan_party/options"
 	"lanyard/pkg/store"
 	"lanyard/server/internal/format"
@@ -84,6 +85,40 @@ func GetHowManyAtTime(w http.ResponseWriter, r *http.Request) {
 	res := format.HowManyResponse{
 		Time:      p,
 		NumPeople: n,
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+
+	json.NewEncoder(w).Encode(res)
+}
+
+func GetWhenToPlayGame(w http.ResponseWriter, r *http.Request) {
+	queryParams := r.URL.Query()
+	if len(queryParams) < 1 || queryParams.Get("game") == "" {
+		log.Print("did not find 'game' parameter on request")
+		http.Error(w, "'game' is a required qeury parameter", http.StatusBadRequest)
+		return
+	}
+
+	g := queryParams.Get("game")
+
+	glPath, ok := options.GetOptionValue(store.GetParty(), options.GameListPath).(string)
+	if !ok {
+		log.Print("no games list")
+		http.Error(w, "no games list on server", http.StatusNotFound)
+		return
+	}
+
+	numP, err := gamelist.GetIdealPlayersForGame(g, glPath)
+	if err != nil || numP < 0 {
+		log.Print("no ideal players for game, finding last time where anyone is around")
+		numP = 1
+	}
+
+	res := format.HowManyResponse{
+		Time:      departures.GetTimeWithNPeople(store.GetParty(), numP).Unix(),
+		NumPeople: numP,
 	}
 
 	w.Header().Set("Content-Type", "application/json")
