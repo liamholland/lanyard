@@ -6,12 +6,14 @@ import (
 	"lanyard/pkg/lan_party/service"
 	"log"
 	"os"
+	"time"
 )
 
 var lanParty lp.LanParty
 
 func InitParty(appConfig *cfg.AppConfig) {
 	lanParty = *loadConfig(appConfig)
+	lanParty.DepartureTimes = make(map[int64]time.Time)
 	lanParty.Identities = make(map[string]string)
 	lanParty.Usernames = make(map[int64]string)
 }

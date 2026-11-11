@@ -5,6 +5,7 @@ import (
 	"fmt"
 	opts "lanyard/pkg/lan_party/options"
 	"lanyard/pkg/store"
+	"lanyard/server/internal/format"
 	"log"
 	"net/http"
 	"strings"
@@ -21,7 +22,7 @@ func UpdateOption(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var req OptionUpdateRequest
+	var req format.OptionUpdateRequest
 
 	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
@@ -70,7 +71,7 @@ func GetUsers(w http.ResponseWriter, r *http.Request) {
 		return m
 	}()
 
-	res := ListUsersResponse{Users: userIps}
+	res := format.ListUsersResponse{Users: userIps}
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
@@ -100,7 +101,7 @@ func GetUserResolutions(w http.ResponseWriter, r *http.Request) {
 		return m
 	}()
 
-	res := ListUserResolutionsResponse{Resolutions: matchedResolutions}
+	res := format.ListUserResolutionsResponse{Resolutions: matchedResolutions}
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)

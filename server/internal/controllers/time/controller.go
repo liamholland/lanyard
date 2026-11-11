@@ -5,6 +5,8 @@ import (
 	"lanyard/pkg/lan_party/departures"
 	"lanyard/pkg/lan_party/options"
 	"lanyard/pkg/store"
+	"lanyard/server/internal/format"
+	"lanyard/server/internal/middleware"
 	"log"
 	"net/http"
 	"strconv"
@@ -24,7 +26,7 @@ func GetStartTime(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	res := SimpleTimeFormat{Time: startTime.Unix()}
+	res := format.SimpleTimeFormat{Time: startTime.Unix()}
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
@@ -37,7 +39,7 @@ func AddDepartureTime(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var req SimpleTimeFormat
+	var req format.SimpleTimeFormat
 
 	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
@@ -45,7 +47,13 @@ func AddDepartureTime(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	uploadErr := departures.AddDepartureTime(store.GetParty(), req.Time)
+	var assocId int64 = 0
+	userId, idErr := middleware.GetIdentity(r)
+	if idErr == nil {
+		assocId = userId
+	}
+
+	uploadErr := departures.AddDepartureTime(store.GetParty(), req.Time, assocId)
 	if uploadErr != nil {
 		http.Error(w, "bad request for departure time; must be a simple POSIX timestamp", http.StatusBadRequest)
 		return
@@ -73,7 +81,7 @@ func GetHowManyAtTime(w http.ResponseWriter, r *http.Request) {
 	t := time.Unix(p, 0)
 	n := departures.HowManyAtTime(store.GetParty(), &t)
 
-	res := HowManyResponse{
+	res := format.HowManyResponse{
 		Time:      p,
 		NumPeople: n,
 	}

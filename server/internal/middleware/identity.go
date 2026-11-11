@@ -2,9 +2,9 @@ package middleware
 
 import (
 	"context"
+	"errors"
 	"lanyard/pkg/store"
-	"lanyard/server/internal/controllers/gamelist"
-	"lanyard/server/internal/controllers/identity"
+	"lanyard/server/internal/format"
 	"log"
 	"net/http"
 )
@@ -12,9 +12,9 @@ import (
 const LanyardIdentityHeader string = "Lanyard-Identity"
 
 var identityRequired map[string]bool = map[string]bool{
-	identity.BasePath + "/register": true,
-	identity.BasePath + "/retrieve": true,
-	gamelist.BasePath + "/resolve":  true,
+	format.IdentityRegisterPath: true,
+	format.IdentityRetrievePath: true,
+	format.GamesResolvePath:     true,
 }
 
 func IdentityStampedMiddleware(next http.Handler) http.Handler {
@@ -36,6 +36,16 @@ func IdentityStampedMiddleware(next http.Handler) http.Handler {
 
 		next.ServeHTTP(w, r)
 	})
+}
+
+func GetIdentity(r *http.Request) (int64, error) {
+	ctxId := r.Context().Value("lan-id")
+	if userId, ok := ctxId.(int64); ok {
+		return userId, nil
+	} else {
+		log.Print("user id on context is invalid, skipping save of user resolution: ", ctxId)
+		return -1, errors.New("no identity on request")
+	}
 }
 
 func withIdentity(r *http.Request, identity int64) *http.Request {
