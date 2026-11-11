@@ -46,6 +46,10 @@
     <button id="departure-setter">set departure time</button><br>
     <button id="num-people-getter">query player numbers</button><br>
 
+    <input type="text" id="game-query-entry"/>
+    <button id="game-query-btn">play before when?</button><br>
+    <p id="game-query-result"></p>
+
     <input type="file" id="file-picker" name="fileList" webkitdirectory multiple />
     <pre id="result"></pre>
 
@@ -100,6 +104,15 @@
                 let regStatus = document.getElementById("register-status");
                 regStatus.textContent = `welcome ${username}`;
                 console.log("registered username: ", username);
+            });
+        });
+
+        document.getElementById("game-query-btn").addEventListener("click", (event) => {
+            let textBox = document.getElementById("game-query-entry");
+            let game = textBox.value;
+            getTimeForGame(game).then(res => {
+                let tSec = document.getElementById("game-query-result");
+                tSec.textContent = `play ${game} before ${formatTimeAndDay(res)}`;
             });
         });
     </script>
