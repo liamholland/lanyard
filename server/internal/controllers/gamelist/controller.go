@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	gl "lanyard/pkg/lan_party/gamelist"
 	opts "lanyard/pkg/lan_party/options"
-	"lanyard/server/internal/store"
+	"lanyard/pkg/store"
 	"log"
 	"net/http"
 )
@@ -30,7 +30,7 @@ func ResolveGames(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	glPath, ok := opts.GetOptionValue(store.GetPartyConfig(), opts.GameListPath).(string)
+	glPath, ok := opts.GetOptionValue(store.GetParty(), opts.GameListPath).(string)
 	if !ok {
 		http.Error(w, "no games list configured on server", http.StatusBadGateway)
 		return

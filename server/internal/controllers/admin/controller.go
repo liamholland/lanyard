@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	opts "lanyard/pkg/lan_party/options"
-	"lanyard/server/internal/store"
+	"lanyard/pkg/store"
 	"log"
 	"net/http"
 	"strings"
@@ -37,7 +37,7 @@ func UpdateOption(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	newSettings := opts.Copy(store.GetPartyConfig())
+	newSettings := opts.Copy(store.GetParty())
 	validErr := option.OnRead(newSettings, req.OptionValue)
 	if validErr != nil {
 		log.Printf("option value %v is invalid for option %s: %s", req.OptionValue, req.OptionName, validErr.Error())
@@ -47,7 +47,7 @@ func UpdateOption(w http.ResponseWriter, r *http.Request) {
 
 	log.Print("value for ", req.OptionName, " validated; updating settings")
 
-	store.SetPartyConfig(newSettings)
+	store.SetParty(newSettings)
 
 	log.Print("settings successfully updated!")
 	w.WriteHeader(http.StatusOK)

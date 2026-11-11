@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"lanyard/pkg/lan_party/departures"
 	"lanyard/pkg/lan_party/options"
-	"lanyard/server/internal/store"
+	"lanyard/pkg/store"
 	"log"
 	"net/http"
 	"strconv"
@@ -12,7 +12,7 @@ import (
 )
 
 func GetStartTime(w http.ResponseWriter, r *http.Request) {
-	optionValue := options.GetOptionValue(store.GetPartyConfig(), options.StartDate)
+	optionValue := options.GetOptionValue(store.GetParty(), options.StartDate)
 	if optionValue == nil {
 		http.Error(w, "no value found for start date option", http.StatusNotFound)
 		return
@@ -45,7 +45,7 @@ func AddDepartureTime(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	uploadErr := departures.AddDepartureTime(store.GetPartyConfig(), req.Time)
+	uploadErr := departures.AddDepartureTime(store.GetParty(), req.Time)
 	if uploadErr != nil {
 		http.Error(w, "bad request for departure time; must be a simple POSIX timestamp", http.StatusBadRequest)
 		return
@@ -71,7 +71,7 @@ func GetHowManyAtTime(w http.ResponseWriter, r *http.Request) {
 	}
 
 	t := time.Unix(p, 0)
-	n := departures.HowManyAtTime(store.GetPartyConfig(), &t)
+	n := departures.HowManyAtTime(store.GetParty(), &t)
 
 	res := HowManyResponse{
 		Time:      p,

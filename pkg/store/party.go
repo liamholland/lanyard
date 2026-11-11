@@ -10,15 +10,17 @@ import (
 
 var lanParty lp.LanParty
 
-func InitPartyConfig(appConfig *cfg.AppConfig) {
+func InitParty(appConfig *cfg.AppConfig) {
 	lanParty = *loadConfig(appConfig)
+	lanParty.Identities = make(map[string]string)
+	lanParty.Usernames = make(map[int64]string)
 }
 
-func GetPartyConfig() *lp.LanParty {
+func GetParty() *lp.LanParty {
 	return &lanParty
 }
 
-func SetPartyConfig(newSettings *lp.LanParty) {
+func SetParty(newSettings *lp.LanParty) {
 	lanParty = *newSettings
 }
 

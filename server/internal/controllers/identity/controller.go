@@ -2,7 +2,7 @@ package identity
 
 import (
 	"encoding/json"
-	"lanyard/server/internal/store"
+	"lanyard/pkg/store"
 	"log"
 	"net/http"
 	"strconv"
