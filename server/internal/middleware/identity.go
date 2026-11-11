@@ -44,7 +44,7 @@ func GetIdentity(r *http.Request) (int64, error) {
 		return userId, nil
 	} else {
 		log.Print("user id on context is invalid, skipping save of user resolution: ", ctxId)
-		return 0, errors.New("no identity on request")
+		return -1, errors.New("no identity on request")
 	}
 }
 
