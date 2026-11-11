@@ -7,7 +7,7 @@ import (
 
 type LanParty struct {
 	Options         map[string]any
-	DepartureTimes  []time.Time
+	DepartureTimes  map[int64]time.Time
 	Usernames       map[int64]string
 	Identities      map[string]string
 	UserResolutions map[int64]gamelist.GameListResolution

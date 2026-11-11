@@ -3,6 +3,7 @@ package identity
 import (
 	"encoding/json"
 	"lanyard/pkg/store"
+	"lanyard/server/internal/format"
 	"log"
 	"net/http"
 	"strconv"
@@ -14,7 +15,7 @@ func CreateUsername(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var req IdentityFormat
+	var req format.IdentityFormat
 
 	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil || req.Username == "" {
@@ -39,7 +40,7 @@ func RetrieveUsername(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var req IdentityFormat
+	var req format.IdentityFormat
 
 	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
@@ -54,7 +55,7 @@ func RetrieveUsername(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	res := IdentityFormat{Username: store.GetUsername(identity)}
+	res := format.IdentityFormat{Username: store.GetUsername(identity)}
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)

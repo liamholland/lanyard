@@ -5,16 +5,10 @@ import (
 	gl "lanyard/pkg/lan_party/gamelist"
 	opts "lanyard/pkg/lan_party/options"
 	"lanyard/pkg/store"
-	"log"
+	"lanyard/server/internal/format"
+	"lanyard/server/internal/middleware"
 	"net/http"
 )
-
-var BasePath string = "/games"
-
-type GameResolutionRequest struct {
-	Games    map[string]int64 `json:"games"`
-	Resolved map[string]bool  `json:"resolved"`
-}
 
 func ResolveGames(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
@@ -22,7 +16,7 @@ func ResolveGames(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var req GameResolutionRequest
+	var req format.GameResolutionRequest
 
 	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
@@ -44,11 +38,9 @@ func ResolveGames(w http.ResponseWriter, r *http.Request) {
 
 	resolution := gl.ResolveGameListFromMap(list, req.Games, req.Resolved)
 
-	ctxId := r.Context().Value("lan-id")
-	if userId, ok := ctxId.(int64); ok {
+	userId, idErr := middleware.GetIdentity(r)
+	if idErr == nil {
 		store.UpdateUserResolution(userId, *resolution)
-	} else {
-		log.Print("user id on context is invalid, skipping save of user resolution: ", ctxId)
 	}
 
 	w.Header().Set("Content-Type", "application/json")

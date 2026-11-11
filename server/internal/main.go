@@ -11,6 +11,7 @@ import (
 	hc "lanyard/server/internal/controllers/health"
 	"lanyard/server/internal/controllers/identity"
 	partyTime "lanyard/server/internal/controllers/time"
+	paths "lanyard/server/internal/format"
 	"lanyard/server/internal/middleware"
 	"log"
 	"net/http"
@@ -28,17 +29,17 @@ func Start(appConfig *cfg.AppConfig) {
 	mux := http.NewServeMux()
 
 	mux.HandleFunc(hc.BasePath, hc.HealthCheck)
-	mux.HandleFunc(partyTime.BasePath+"/start", partyTime.GetStartTime)
-	mux.HandleFunc(partyTime.BasePath+"/departure", partyTime.AddDepartureTime)
-	mux.HandleFunc(partyTime.BasePath+"/howmany", partyTime.GetHowManyAtTime)
-	mux.HandleFunc(games.BasePath+"/resolve", games.ResolveGames)
-	mux.HandleFunc(identity.BasePath+"/register", identity.CreateUsername)
-	mux.HandleFunc(identity.BasePath+"/retrieve", identity.RetrieveUsername)
+	mux.HandleFunc(paths.TimeStartPath, partyTime.GetStartTime)
+	mux.HandleFunc(paths.TimeDepPath, partyTime.AddDepartureTime)
+	mux.HandleFunc(paths.TimeHowManyPath, partyTime.GetHowManyAtTime)
+	mux.HandleFunc(paths.GamesResolvePath, games.ResolveGames)
+	mux.HandleFunc(paths.IdentityRegisterPath, identity.CreateUsername)
+	mux.HandleFunc(paths.IdentityRetrievePath, identity.RetrieveUsername)
 
 	// admin control endpoints - only localhost accepted
-	mux.HandleFunc(admin.BasePath+"/options/update", admin.UpdateOption)
-	mux.HandleFunc(admin.BasePath+"/users", admin.GetUsers)
-	mux.HandleFunc(admin.BasePath+"/users/resolved", admin.GetUserResolutions)
+	mux.HandleFunc(paths.AdminOptionsPath, admin.UpdateOption)
+	mux.HandleFunc(paths.AdminUsersPath, admin.GetUsers)
+	mux.HandleFunc(paths.AdminUsersResolvedPath, admin.GetUserResolutions)
 
 	subFS, htmlPathErr := fs.Sub(lanyardFs, "lanyard")
 	if htmlPathErr != nil {

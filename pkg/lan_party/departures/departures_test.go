@@ -7,10 +7,10 @@ import (
 )
 
 func TestInvalidOption(t *testing.T) {
-	testLP := lanparty.LanParty{DepartureTimes: []time.Time{
-		time.Now().Add(time.Hour * 3),
-		time.Now().Add(time.Hour * 2),
-		time.Now().Add(time.Hour * 1),
+	testLP := lanparty.LanParty{DepartureTimes: map[int64]time.Time{
+		0: time.Now().Add(time.Hour * 3),
+		1: time.Now().Add(time.Hour * 2),
+		2: time.Now().Add(time.Hour * 1),
 	}}
 
 	now := time.Now()
