@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"io"
 	cfg "lanyard/pkg/config"
-	service "lanyard/pkg/lan_party/gamelist"
+	gl "lanyard/pkg/lan_party/gamelist"
 	server "lanyard/server/pkg"
 	"log"
 	"net/http"
@@ -97,7 +97,7 @@ type ListUsersResponse struct {
 }
 
 type ListUserResolutionsResponse struct {
-	Resolutions map[string]service.GameListResolution `json:"resolutions"`
+	Resolutions map[string]gl.GameListResolution `json:"resolutions"`
 }
 
 func init() {
@@ -269,7 +269,7 @@ func GetResolutionStatusForGame(game string) {
 		fmt.Println("use 'gamelist show' to list the games on the game list")
 	} else {
 		fmt.Printf("result of game resolution for %s:\n", game)
-		displayGameResolution((*service.GameListResolution)(&gameStatus))
+		displayGameResolution((*gl.GameListResolution)(&gameStatus))
 		if len(unknown) > 0 {
 			fmt.Println("users with no resolution: ", strings.Join(unknown, ", "))
 		}

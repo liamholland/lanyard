@@ -5,13 +5,13 @@ import (
 	"errors"
 	"io/fs"
 	cfg "lanyard/pkg/config"
+	"lanyard/pkg/store"
 	admin "lanyard/server/internal/controllers/admin"
 	games "lanyard/server/internal/controllers/gamelist"
 	hc "lanyard/server/internal/controllers/health"
 	"lanyard/server/internal/controllers/identity"
 	partyTime "lanyard/server/internal/controllers/time"
 	"lanyard/server/internal/middleware"
-	"lanyard/server/internal/store"
 	"log"
 	"net/http"
 	"strconv"
@@ -23,8 +23,7 @@ var lanyardFs embed.FS
 func Start(appConfig *cfg.AppConfig) {
 	log.Print("starting server on port ", appConfig.ServerPort)
 
-	store.InitPartyConfig(appConfig)
-	store.InitIdentities()
+	store.InitParty(appConfig)
 
 	mux := http.NewServeMux()
 

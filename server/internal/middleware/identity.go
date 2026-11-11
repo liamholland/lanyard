@@ -2,9 +2,9 @@ package middleware
 
 import (
 	"context"
+	"lanyard/pkg/store"
 	"lanyard/server/internal/controllers/gamelist"
 	"lanyard/server/internal/controllers/identity"
-	"lanyard/server/internal/store"
 	"log"
 	"net/http"
 )
