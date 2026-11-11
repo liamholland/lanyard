@@ -9,6 +9,7 @@ import (
 	gl "lanyard/pkg/lan_party/gamelist"
 	server "lanyard/server/pkg"
 	"log"
+	"net"
 	"net/http"
 	"os"
 	"strings"
@@ -51,6 +52,16 @@ var updateServerSettingCmd = &cobra.Command{
 	},
 }
 
+var serverAddrCmd = &cobra.Command{
+	Use:   "where",
+	Short: "get the address of the server on the LAN",
+	Run: func(cmd *cobra.Command, args []string) {
+		CheckVerboseMode(cmd)
+		IsServerUp()
+		DisplayServerUrl()
+	},
+}
+
 var usersCmd = &cobra.Command{
 	Use:   "users",
 	Short: "interact with server user information",
@@ -90,8 +101,6 @@ var getGameResolutionStatus = &cobra.Command{
 	},
 }
 
-const serverLocation string = "http://localhost:1311"
-
 type ListUsersResponse struct {
 	Users map[string]string `json:"users"`
 }
@@ -111,6 +120,7 @@ func init() {
 	serverCmd.AddCommand(startServerCmd)
 	serverCmd.AddCommand(serverStatusCmd)
 	serverCmd.AddCommand(updateServerSettingCmd)
+	serverCmd.AddCommand(serverAddrCmd)
 	serverCmd.AddCommand(usersCmd)
 
 	rootCmd.AddCommand(serverCmd)
@@ -121,7 +131,7 @@ func StartServer(appConfig *cfg.AppConfig) {
 }
 
 func IsServerUp() {
-	request := serverLocation + "/health/check"
+	request := serverLocationLocal() + "/health/check"
 	serverRes, serverErr := http.Get(request)
 	if serverErr != nil || serverRes == nil {
 		fmt.Println("server is not running; start it with 'server start'")
@@ -143,7 +153,7 @@ func IsServerUp() {
 }
 
 func UpdateServerSetting(optionName string, optionValue string) {
-	requestPath := serverLocation + "/admin/options/update"
+	requestPath := serverLocationLocal() + "/admin/options/update"
 	requestBody := map[string]string{
 		"option": optionName,
 		"value":  optionValue,
@@ -170,7 +180,7 @@ func UpdateServerSetting(optionName string, optionValue string) {
 }
 
 func GetUsers() {
-	request := serverLocation + "/admin/users"
+	request := serverLocationLocal() + "/admin/users"
 	serverRes, serverErr := http.Get(request)
 	if serverErr != nil {
 		log.Fatal("user list fetch from server failed: ", serverErr)
@@ -198,7 +208,7 @@ func GetUsers() {
 }
 
 func GetUserResolutionStatus() {
-	request := serverLocation + "/admin/users/resolved"
+	request := serverLocationLocal() + "/admin/users/resolved"
 	serverRes, serverErr := http.Get(request)
 	if serverErr != nil {
 		log.Fatal("user list fetch from server failed: ", serverErr)
@@ -231,7 +241,7 @@ func GetUserResolutionStatus() {
 }
 
 func GetResolutionStatusForGame(game string) {
-	request := serverLocation + "/admin/users/resolved"
+	request := serverLocationLocal() + "/admin/users/resolved"
 	serverRes, serverErr := http.Get(request)
 	if serverErr != nil {
 		log.Fatal("user list fetch from server failed: ", serverErr)
@@ -274,4 +284,28 @@ func GetResolutionStatusForGame(game string) {
 			fmt.Println("users with no resolution: ", strings.Join(unknown, ", "))
 		}
 	}
+}
+
+func DisplayServerUrl() {
+	fmt.Println("local: ", serverLocationLocal())
+	fmt.Println("LAN web page: ", serverLocationLAN()+"/lanyard")
+}
+
+func serverLocationLocal() string {
+	return "http://localhost:" + fmt.Sprintf("%d", GetAppConfig().ServerPort)
+}
+
+func serverLocationLAN() string {
+	return "http://" + getOutboundIP() + ":" + fmt.Sprintf("%d", GetAppConfig().ServerPort)
+}
+
+func getOutboundIP() string {
+	conn, err := net.Dial("udp", "8.8.8.8:80")
+	if err != nil {
+		log.Fatal("failed to query ip against DNS server")
+	}
+	defer conn.Close()
+
+	localAddr := conn.LocalAddr().(*net.UDPAddr)
+	return localAddr.IP.String()
 }
